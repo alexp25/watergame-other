@@ -1,0 +1,36 @@
+Data is collected from a house.There are two tanks. Sump is underground, from which the water is pumped to the overhead tanks Tank1 and Tank2.
+
+An Ultrasonic distance sensor is mounted near the top of each tank that monitors and logs the distance of the water surface from the sensor at fixed intervals.
+ 
+There are 13 sets of data for Tank 1 and 16 sets of data for Tank 2. The description reg. these datasets are given in Tank 1-Data Description.xlsx and Tank 2-Data Description.xlsx, respectively.
+
+The data logged is the vertical distance of the water surface in the tank from the sensor's location. 
+The minimum reading of sensor is 19 cm which indicates full tank and the maximum reading is 88cm which indicates an empty tank.
+
+So to calculate the percentage of tank that has been filled as of now, we use the formula: percent_full=100-(100*(data-19)/(88-19)))
+The data is logged once very 15 seconds.
+
+The data logged is the one adjusted with calibration equation. The equation found is as follows: 
+
+Sensor calibration results:
+ f(x) = p1*x + p2
+Coefficients (with 95% confidence bounds):
+       p1 =       1.033  (1.024, 1.042)
+       p2 =       1.187  (0.7033, 1.67)
+
+Goodness of fit:
+  SSE: 7.109
+  R-square: 0.9995
+  Adjusted R-square: 0.9995
+  RMSE: 0.4951
+  
+Note Reg. consumption:
+
+The experimental setup was installed in a house with a Solar water heater (capacity 300 Liters) that gets filled every midnight at 12.00 onwards from Tank 1. 
+Hence, the level changes logged for tank 1 during the hours 00.00 to 03.00 am are high. During the rest of the day, the consumption is that of a regular household.  
+
+The household has four adult occupants, with three occupants leaving the house by 10.00 am every weekday and returning by 4.00 pm.
+Tank 1 is used for supplying all household needs.
+Tank 2 is used only for gardening purposes.
+
+https://data.mendeley.com/datasets/s6tt6j22p9/2

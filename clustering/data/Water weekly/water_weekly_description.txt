@@ -1,0 +1,9 @@
+Set de date privind consumul de apă pentru orașul Alicante, Spania, ce contine media pe oră, timp de o săptămână. 
+Datele au fost obținute în perioada Ianuarie 2015 - Ianuarie 2017.
+Proiectul DAIAD include 822 de gospodării din Alicante, în perioada 01.01.2015 - 20.01.2017.
+
+Fiecare intrare din setul de date este alcătuită din:
+	* identificator anonimizat al unei gospodării;
+	* latitudinea geografică carteziană;
+	* longitudinea locației sale;
+	* media pentru fiecare oră săptămânală (24 × 7 = 168 valori). 

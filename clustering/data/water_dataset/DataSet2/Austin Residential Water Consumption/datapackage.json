@@ -1,0 +1,228 @@
+{
+  "bytes": 2158078,
+  "citation": "N/A",
+  "contributors": [
+    {
+      "email": "support@JohnSnowLabs.com",
+      "role": "author",
+      "title": "John Snow Labs",
+      "uri": "http://www.JohnSnowLabs.com"
+    }
+  ],
+  "datahub": {
+    "created": "2018-01-04T10:43:00.493235",
+    "findability": "published",
+    "flowid": "JohnSnowLabs/austin-residential-water-consumption/3",
+    "modified": "2018-09-24T18:59:12.132627",
+    "owner": "JohnSnowLabs",
+    "ownerid": "JohnSnowLabs"
+  },
+  "date_created": "2015-08-31",
+  "description": "This dataset shows monthly residential water consumption grouped by zip code and customer class for the year 2012.",
+  "documentation": "Residential water use (also called domestic use, household use, or tap water use) includes all indoor and outdoor uses of drinking quality water at single-family and multifamily dwellings. These uses include a number of defined purposes or water end uses such as flushing toilets, washing clothes and dishes, showering and bathing, drinking, food preparation, watering lawns and gardens, and maintaining swimming pools. Some of these end uses are detectable and measurable while others are more difficult to gauge.",
+  "hash": "35bea84966cfb218284d5bb9d7fd7ced",
+  "id": "JohnSnowLabs/austin-residential-water-consumption",
+  "keywords": [
+    "Austin Residential Water",
+    "Water Consumption",
+    "Austin Water Consumption",
+    "Austin Utilities",
+    "City of Austin Utilities"
+  ],
+  "last_updated": "2017-10-20",
+  "license": "John Snow Labs Standard License",
+  "name": "austin-residential-water-consumption",
+  "other_titles": [
+    "Water Consumption Grouped by Zip Code",
+    "Austin Monthly Residential Water Consumption"
+  ],
+  "resources": [
+    {
+      "bytes": 433255,
+      "datahub": {
+        "type": "original"
+      },
+      "dpp:streamedFrom": "https://s3.amazonaws.com/rawstore.datahub.io/6b43d07c93460339953922db58573f32.csv",
+      "encoding": "ISO-8859-1",
+      "format": "csv",
+      "mediatype": "text/csv",
+      "name": "austin-residential-water-consumption-csv_original",
+      "path": "archive/austin-residential-water-consumption-csv.csv",
+      "pathType": "local",
+      "profile": "data-resource",
+      "schema": {
+        "fields": [
+          {
+            "constraints": {
+              "level": "Nominal"
+            },
+            "description": "Code for saving record by Year and Month",
+            "name": "Code_Year_Month",
+            "type": "integer"
+          },
+          {
+            "constraints": {
+              "level": "Nominal"
+            },
+            "description": "Resident Postal Code",
+            "name": "Postal_Code",
+            "type": "integer"
+          },
+          {
+            "description": "Class of the Customer",
+            "name": "Customer_Class",
+            "type": "string"
+          },
+          {
+            "constraints": {
+              "level": "Ratio"
+            },
+            "description": "Total Gallons of Water Consumed",
+            "name": "Total_Gallons",
+            "type": "integer"
+          }
+        ]
+      }
+    },
+    {
+      "bytes": 652,
+      "datahub": {
+        "type": "derived/report"
+      },
+      "description": "Validation report for tabular data",
+      "dpp:streamedFrom": "/tmp/tmpifm3546l/JohnSnowLabs/austin-residential-water-consumption/validation_report/data/c840dcc32a1d3d26f5661ac82bb2ba67/validation_report.json",
+      "format": "json",
+      "hash": "c840dcc32a1d3d26f5661ac82bb2ba67",
+      "name": "validation_report",
+      "path": "data/validation_report.json",
+      "profile": "data-resource"
+    },
+    {
+      "bytes": 444388,
+      "datahub": {
+        "derivedFrom": [
+          "austin-residential-water-consumption-csv"
+        ],
+        "type": "derived/csv"
+      },
+      "dialect": {
+        "delimiter": ",",
+        "doubleQuote": true,
+        "lineTerminator": "\r\n",
+        "quoteChar": "\"",
+        "skipInitialSpace": false
+      },
+      "dpp:streamedFrom": "/tmp/tmpifm3546l/JohnSnowLabs/austin-residential-water-consumption/austin-residential-water-consumption-csv_csv/data/6b43d07c93460339953922db58573f32/austin-residential-water-consumption-csv_csv.csv",
+      "encoding": "utf-8",
+      "format": "csv",
+      "hash": "6b43d07c93460339953922db58573f32",
+      "mediatype": "text/csv",
+      "name": "austin-residential-water-consumption-csv_csv",
+      "path": "data/austin-residential-water-consumption-csv_csv.csv",
+      "pathType": "local",
+      "profile": "data-resource",
+      "rowcount": 11132,
+      "schema": {
+        "fields": [
+          {
+            "constraints": {
+              "level": "Nominal"
+            },
+            "description": "Code for saving record by Year and Month",
+            "name": "Code_Year_Month",
+            "type": "integer"
+          },
+          {
+            "constraints": {
+              "level": "Nominal"
+            },
+            "description": "Resident Postal Code",
+            "name": "Postal_Code",
+            "type": "integer"
+          },
+          {
+            "description": "Class of the Customer",
+            "name": "Customer_Class",
+            "type": "string"
+          },
+          {
+            "constraints": {
+              "level": "Ratio"
+            },
+            "description": "Total Gallons of Water Consumed",
+            "name": "Total_Gallons",
+            "type": "integer"
+          }
+        ]
+      },
+      "signed": true
+    },
+    {
+      "bytes": 1279783,
+      "datahub": {
+        "derivedFrom": [
+          "austin-residential-water-consumption-csv"
+        ],
+        "type": "derived/json"
+      },
+      "dpp:streamedFrom": "/tmp/tmpifm3546l/JohnSnowLabs/austin-residential-water-consumption/austin-residential-water-consumption-csv_json/data/0230af5303971361e856053351d5830b/austin-residential-water-consumption-csv_json.json",
+      "encoding": "utf-8",
+      "format": "json",
+      "hash": "0230af5303971361e856053351d5830b",
+      "mediatype": "text/csv",
+      "name": "austin-residential-water-consumption-csv_json",
+      "path": "data/austin-residential-water-consumption-csv_json.json",
+      "pathType": "local",
+      "profile": "data-resource",
+      "rowcount": 11132,
+      "schema": {
+        "fields": [
+          {
+            "constraints": {
+              "level": "Nominal"
+            },
+            "description": "Code for saving record by Year and Month",
+            "name": "Code_Year_Month",
+            "type": "integer"
+          },
+          {
+            "constraints": {
+              "level": "Nominal"
+            },
+            "description": "Resident Postal Code",
+            "name": "Postal_Code",
+            "type": "integer"
+          },
+          {
+            "description": "Class of the Customer",
+            "name": "Customer_Class",
+            "type": "string"
+          },
+          {
+            "constraints": {
+              "level": "Ratio"
+            },
+            "description": "Total Gallons of Water Consumed",
+            "name": "Total_Gallons",
+            "type": "integer"
+          }
+        ]
+      },
+      "signed": true
+    }
+  ],
+  "source_license_requirements": "N/A",
+  "sources": [
+    {
+      "title": "John Snow Labs"
+    },
+    {
+      "title": "Data City of Austin"
+    }
+  ],
+  "spatial_coverage": "Austin, United States",
+  "temporal_coverage": "2015-2017",
+  "title": "Austin Residential Water Consumption",
+  "update_frequency": "Annual",
+  "version": "2017-10-20"
+}

@@ -1,0 +1,13 @@
+Acest set de date conține date privind consumul de la duș al persoanelor care participă la Trialul A al proiectului FP7 DAIAD.
+Setul de date a fost generat de senzorii DAIAD utilizați în gospodăriile din Alicante, Spania.
+Datele au fost stocate pe senzorii DAIAD și au fost încărcate de către membrii gospodăriei utilizând o aplicație mobilă. 
+
+Setul de date cuprinde două părți:
+ 	* Trial A: Setul de date cuprinde 10.729 evenimente/date de la 125 de dispozitive (39 de gospodării dețin două dispozitive și două gospodării dețin trei dispozitive)
+		* Primul eveniment de duș înregistrat este din 15 martie 2016 și ultimul din 28 februarie 2017.
+		* Fiecare eveniment de duș conține date legate de volumul total, energia consumată si temperatura apei.	
+		* În medie, există 90 de evenimente de duș pe dispozitiv. Dușurile în timp real reprezintă 32% din setul de date.
+
+	* Proces extins A: Setul de date cuprinde 602 evenimente de duș pentru 26 de dispozitive (4 gospodării dețin două dispozitive). 
+		* Primul eveniment de duș înregistrat este din 1 martie 2017 și ultimul din 14 iunie 2017. 
+		* În medie, există 32 de evenimente de duș pe dispozitiv, cu dușuri în timp real care reprezintă 21% din setul de date.

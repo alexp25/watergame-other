@@ -1,0 +1,3 @@
+This dataset shows monthly residential water consumption grouped by zip code and customer class for the year 2012.
+https://datahub.io/JohnSnowLabs/austin-residential-water-consumption
+

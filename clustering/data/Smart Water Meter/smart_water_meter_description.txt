@@ -1,0 +1,9 @@
+Acest set de date a fost generat pentru proiectul FP7 DAIAD. 
+Acesta conține serii de timp SWM pentru 1.007 consumatori ai serviciului de apă AMAEM (situat în Alicante).
+Consumatorii au fost selectați aleatoriu din cele ~ 110.000 contoare inteligente de apă disponibile din Alicante.
+
+Fiecare serie de timp începe la 01/01/2015 la 00:00 și se termină la 19/05/2017 la 23:59. 
+Datele de la 01/01/2015 00:00 până la începutul probei au fost furnizate și încărcate în sistemul DAIAD într-un singur lot. 
+Fiecare serie cronologică conține măsurători orare ale consumului de apă dintr-o gospodărie, împreună cu ora exactă a măsurării. 
+Fiecare măsurare conține volumul total de apă consumat de la instalarea SWM, precum și volumul de apă consumat de la ultima măsurare.
+Setul de date include 16.857.056 măsurători în total, care se ridică la 16.739 măsurători per utilizator.
