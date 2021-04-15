@@ -87,10 +87,27 @@ def create_timeseries(data, header, datax=None):
     return tss
 
 
-def normalize(a, ax=0):
+def normalize_sum_axis(a, ax=0):
+    new_matrix = normalize_sum_1(a, ax)
+    # new_matrix = normalize1(new_matrix, 1-ax)
+    return new_matrix
+
+def normalize_sum_1(a, ax=0):
     row_sums = a.sum(axis=ax)
     if ax == 1:
         new_matrix = a / row_sums[:, np.newaxis]
     else:
         new_matrix = a / row_sums[np.newaxis, :]
+    new_matrix = np.nan_to_num(new_matrix) 
+    return new_matrix
+
+def normalize_axis_01(a, ax=0):
+    sizea = np.shape(a)
+    min_vals = a.min(axis=ax)
+    max_vals = a.max(axis=ax)
+    new_matrix = a  
+    for i in range(sizea[1-ax]):
+        for j in range(sizea[ax]):
+            new_matrix[i][j] = (a[i][j] - min_vals[i]) / (max_vals[i] - min_vals[i])
+    new_matrix = np.nan_to_num(new_matrix) 
     return new_matrix

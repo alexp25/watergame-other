@@ -9,3 +9,7 @@ https://foobar.protonchain.com/
 https://nft.protonchain.com/
 
 https://www.npmjs.com/package/@proton/web-sdk
+
+https://docs.protonchain.com/sdk/
+
+A non-fungible token (NFT) is a unit of data on a digital ledger called a blockchain, where each NFT can represent a unique digital item, and thus they are not interchangeable.

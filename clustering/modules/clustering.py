@@ -71,11 +71,14 @@ def k_mean_distance_gen(data, center_point, i_centroid, cluster_labels):
     return distances, avg_dist, sum_dist
 
 
-def clustering_kmeans(X, k):
+def clustering_kmeans(X, k, same_order):
     # kmeans = KMeans(n_clusters=k, init="random")
     # X_input = np.reshape(X, (-1, 1))
     X_input = X
-    kmeans = KMeans(n_clusters=k, init="k-means++")
+    if same_order:
+        kmeans = KMeans(n_clusters=k, init="k-means++", random_state=0)
+    else:
+        kmeans = KMeans(n_clusters=k, init="k-means++")
     kmeans.fit(X_input)
     clusters = kmeans.predict(X_input)
 
@@ -91,26 +94,26 @@ def clustering_kmeans(X, k):
     print("cluster labels")
     print(kmeans.labels_)
 
-    # average_silhouette_score = silhouette_score(X_input, clusters)
+    average_silhouette_score = silhouette_score(X_input, clusters)
     # print("For n_clusters =", k,
     #       "The average silhouette_score is :", average_silhouette_score)
 
-    # average_euclid_dist = 0
-    # sum_euclid_dist = 0
-    # # get the distance between points that are assigned to each cluster
-    # for i, point in enumerate(centroids):
-    #     # get the distance for each point
-    #     distance, average_euclid_dist_1, sum_euclid_dist_1 = k_mean_distance_gen(X_input, point, i, clusters)
-    #     # get the average distance
-    #     average_euclid_dist += average_euclid_dist_1
-    #     sum_euclid_dist += sum_euclid_dist_1
+    average_euclid_dist = 0
+    sum_euclid_dist = 0
+    # get the distance between points that are assigned to each cluster
+    for i, point in enumerate(centroids):
+        # get the distance for each point
+        distance, average_euclid_dist_1, sum_euclid_dist_1 = k_mean_distance_gen(X_input, point, i, clusters)
+        # get the average distance
+        average_euclid_dist += average_euclid_dist_1
+        sum_euclid_dist += sum_euclid_dist_1
 
     # average_euclid_dist /= len(centroids)
     # print("Inertia: ", kmeans.inertia_)
     # print("WCSS: ", sum_euclid_dist)
     # print("The average euclidean distance is :", average_euclid_dist)
 
-    average_silhouette_score = 0
-    sum_euclid_dist = 0
+    # average_silhouette_score = 0
+    # sum_euclid_dist = 0
 
     return X, kmeans, average_silhouette_score, sum_euclid_dist

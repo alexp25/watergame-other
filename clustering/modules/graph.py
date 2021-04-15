@@ -58,6 +58,11 @@ class CMapMatrixElement:
 #     x = []
 #     y = []
 
+def plot(y, x):    
+    fig = plt.figure()
+    plt.plot(x, y)
+    plt.show()
+    return fig
 
 def plot_xy(x, y, rads, labels, colors, title, xlabel, ylabel, scale, show_legend, labels_points):
     fig, ax = plt.subplots()
@@ -140,7 +145,7 @@ def plot_timeseries_multi_sub2(timeseries_arrays: List[List[Timeseries]], title,
                 set_disp(title[i], xlabel, ylabel[i])
             else:
                 set_disp(title[i], "", ylabel[i])
-            plt.legend()
+            plt.legend(loc="upper left")
 
     # ax.tick_params(axis = 'both', which = 'major', labelsize = FSIZE_LABEL_XS)
     # ax.tick_params(axis = 'both', which = 'minor', labelsize = FSIZE_LABEL_XS)
