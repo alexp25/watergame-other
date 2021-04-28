@@ -145,9 +145,9 @@ for option in options:
 
     start_index = 1
     end_index = None
-    start_col = 6
+    start_col = 3
     end_col = None
-    fill_start = True
+    fill_start = False
 
     norm_sum = option["norm_sum"]
     norm_axis = option["norm_axis"]

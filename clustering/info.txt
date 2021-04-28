@@ -1,0 +1,9 @@
+Advantages:
+K-means: Much faster than DBSCAN and OPTICS.
+DBSCAN: No number of clusters needed
+OPTICS: No number of clusters needed. Identifies clusters with different densities.
+
+Disadvantages:
+K-means: Estimated of number of clusters required
+DBSCAN: Does not work well over clusters with different densities
+OPTICS: Slower than DBSCAN
