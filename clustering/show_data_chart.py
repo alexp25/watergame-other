@@ -20,6 +20,7 @@ root_data_folder = "./data"
 # read the data from the csv file
 
 filenames = ["Water weekly/water_avg_weekly.csv"]
+filenames = ["Water weekly/water_avg_weekly_trends.csv"]
 # filenames = ["Smart Water Meter/processed/avg_out.csv"]
 # filenames = ["Smart Water Meter/processed/avg_out_2t.csv"]
 

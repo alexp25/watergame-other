@@ -42,7 +42,8 @@ def OpticsClustering(X, samples=5):
 # python3.7 ts_clustering.py water_avg_weekly.csv 100 5
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        fn = "data/Water weekly/water_avg_weekly.csv"
+        # fn = "data/Water weekly/water_avg_weekly.csv"
+        fn = "data/Water weekly/water_avg_weekly_trends.csv"
         samples = 100
         n_clusters = 5
     else:
@@ -84,5 +85,5 @@ if __name__ == "__main__":
         plt.show()
 
         # Analyze the TS for each center
-        # for idx in range(0, n_clusters):
-        #     TSAnalysis(centers[idx])
+        for idx in range(0, n_clusters):
+            TSAnalysis(centers[idx])
