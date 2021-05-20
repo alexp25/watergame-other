@@ -20,7 +20,7 @@ root_data_folder = "./data"
 # read the data from the csv file
 
 filenames = ["Water weekly/water_avg_weekly.csv"]
-filenames = ["Water weekly/water_avg_weekly_trends.csv"]
+# filenames = ["Water weekly/water_avg_weekly_trends.csv"]
 # filenames = ["Smart Water Meter/processed/avg_out.csv"]
 # filenames = ["Smart Water Meter/processed/avg_out_2t.csv"]
 
@@ -37,7 +37,7 @@ def run_clustering(x, nc, xheader, xlabels=None):
         silhouette_score_vect = []
         WCSS_vect = []
         optimal_number_of_clusters = 2
-        r = range(2,11)
+        r = range(2,40)
         for nc1 in r:
             X, kmeans, silhouette_score, WCSS = clustering.clustering_kmeans(x, nc1, True)
             silhouette_score_vect.append(silhouette_score)
@@ -46,8 +46,10 @@ def run_clustering(x, nc, xheader, xlabels=None):
                 max_silhouette_score = silhouette_score
                 optimal_number_of_clusters = nc1
         nc = optimal_number_of_clusters
-        graph.plot(silhouette_score_vect, list(r))
-        graph.plot(WCSS_vect, list(r))
+        fig = graph.plot(silhouette_score_vect, list(r), "Optimal number of clusters", "Number of clusters", "Silhouette score")
+        WCSS_vect = utils.normalize_axis_01(np.array([WCSS_vect]), 1).tolist()[0]
+        fig = graph.plot(WCSS_vect, list(r), "Optimal number of clusters", "Number of clusters", "WCSS (scaled)")
+        graph.save_figure(fig, "./figs/eval.png")
         X, kmeans, silhouette_score, _ = clustering.clustering_kmeans(x, nc, True)
         print("optimal number of clusters: " + str(nc) + " (" + str(max_silhouette_score) + ")")
     else:
@@ -68,52 +70,52 @@ def run_clustering(x, nc, xheader, xlabels=None):
 
 options = [
     
-    {
-        "nc": 5,
-        "norm_sum": False,
-        "norm_axis": False
-    },
-    {
-        "nc": 5,
-        "norm_sum": True,
-        "norm_axis": False
-    },
-    {
-        "nc": 5,
-        "norm_sum": False,
-        "norm_axis": True
-    },
-    {
-        "nc": 5,
-        "norm_sum": True,
-        "norm_axis": True
-    },
-    {
-        "nc": 3,
-        "norm_sum": False,
-        "norm_axis": False
-    },
-    {
-        "nc": 3,
-        "norm_sum": True,
-        "norm_axis": False
-    },
-    {
-        "nc": 3,
-        "norm_sum": False,
-        "norm_axis": True
-    },
-    {
-        "nc": 3,
-        "norm_sum": True,
-        "norm_axis": True
-    },
-
     # {
-    #     "nc": None,
+    #     "nc": 5,
     #     "norm_sum": False,
     #     "norm_axis": False
     # },
+    # {
+    #     "nc": 5,
+    #     "norm_sum": True,
+    #     "norm_axis": False
+    # },
+    # {
+    #     "nc": 5,
+    #     "norm_sum": False,
+    #     "norm_axis": True
+    # },
+    # {
+    #     "nc": 5,
+    #     "norm_sum": True,
+    #     "norm_axis": True
+    # },
+    # {
+    #     "nc": 3,
+    #     "norm_sum": False,
+    #     "norm_axis": False
+    # },
+    # {
+    #     "nc": 3,
+    #     "norm_sum": True,
+    #     "norm_axis": False
+    # },
+    # {
+    #     "nc": 3,
+    #     "norm_sum": False,
+    #     "norm_axis": True
+    # },
+    # {
+    #     "nc": 3,
+    #     "norm_sum": True,
+    #     "norm_axis": True
+    # },
+
+    {
+        "nc": None,
+        "norm_sum": False,
+        "norm_axis": False
+    },
     # {
     #     "nc": None,
     #     "norm_sum": True,

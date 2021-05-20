@@ -15,7 +15,7 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         fn = "data/Water weekly/water_avg_weekly.csv"
         samples = 100
-        n_clusters = 5
+        n_clusters = 4
     else:
         fn = sys.argv[1]
         samples = int(sys.argv[2])

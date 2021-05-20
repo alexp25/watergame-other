@@ -53,11 +53,9 @@ def create_timeseries(data, header, datax=None):
     # colors = ['Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Indigo']
 
     ck = 0
-
     sdata = np.shape(data)
-
     print(sdata)
-
+    
     rows = sdata[0]
     cols = sdata[1]   
 

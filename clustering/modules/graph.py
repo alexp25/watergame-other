@@ -58,9 +58,10 @@ class CMapMatrixElement:
 #     x = []
 #     y = []
 
-def plot(y, x):    
+def plot(y, x, title, xlabel, ylabel):    
     fig = plt.figure()
     plt.plot(x, y)
+    set_disp(title, xlabel, ylabel)
     plt.show()
     return fig
 
