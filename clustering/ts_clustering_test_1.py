@@ -32,8 +32,6 @@ def KMeansClustering(X, n_clusters=5):
     centers = model.cluster_centers_
     return clusters, centers
 
-    
-
 def OpticsClustering(X, samples=5):
     model = OPTICS(min_samples=25) #adjust minimum samples
     clusters = model.fit_predict(X)

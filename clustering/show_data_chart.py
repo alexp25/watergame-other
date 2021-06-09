@@ -5,6 +5,8 @@ from modules import loader, graph
 from modules import clustering
 from modules import utils
 
+from matplotlib import pyplot as plt
+
 
 import numpy as np
 import pandas as pd
@@ -20,43 +22,49 @@ root_data_folder = "./data"
 # read the data from the csv file
 
 filenames = ["Water weekly/water_avg_weekly.csv"]
-# filenames = ["Water weekly/water_avg_weekly_trends.csv"]
+filenames = ["Water weekly/water_avg_weekly_trends.csv"]
 # filenames = ["Smart Water Meter/processed/avg_out.csv"]
 # filenames = ["Smart Water Meter/processed/avg_out_2t.csv"]
 
 
 def run_clustering(x, nc, xheader, xlabels=None):
-    # x = np.transpose(x)
-
-    # sx = np.shape(x)
-    # print(sx)
-
     if nc is None:
         # use silhouette score
         max_silhouette_score = 0
         silhouette_score_vect = []
         WCSS_vect = []
         optimal_number_of_clusters = 2
-        r = range(2,40)
+        r = range(2,20)
         for nc1 in r:
-            X, kmeans, silhouette_score, WCSS = clustering.clustering_kmeans(x, nc1, True)
+            X, kmeans, centroids, silhouette_score, WCSS, average_euclid_dist_mean = clustering.clustering_kmeans(x, nc1, True)
             silhouette_score_vect.append(silhouette_score)
             WCSS_vect.append(WCSS)
+            # WCSS_vect.append(average_euclid_dist_mean)
             if silhouette_score > max_silhouette_score:
                 max_silhouette_score = silhouette_score
                 optimal_number_of_clusters = nc1
         nc = optimal_number_of_clusters
         fig = graph.plot(silhouette_score_vect, list(r), "Optimal number of clusters", "Number of clusters", "Silhouette score")
         WCSS_vect = utils.normalize_axis_01(np.array([WCSS_vect]), 1).tolist()[0]
-        fig = graph.plot(WCSS_vect, list(r), "Optimal number of clusters", "Number of clusters", "WCSS (scaled)")
-        graph.save_figure(fig, "./figs/eval.png")
-        X, kmeans, silhouette_score, _ = clustering.clustering_kmeans(x, nc, True)
+        fig = graph.plot(WCSS_vect, list(r), "Optimal number of clusters", "Number of clusters", "WCSS")
+        graph.save_figure(fig, "./figs/eval_trends_inertia.png")
+        X, kmeans, centroids, silhouette_score, _, _ = clustering.clustering_kmeans(x, nc, True)
         print("optimal number of clusters: " + str(nc) + " (" + str(max_silhouette_score) + ")")
     else:
-        X, kmeans, _, _ = clustering.clustering_kmeans(x, nc, True)
-    xc = np.transpose(kmeans.cluster_centers_)
-    # xc = np.transpose(xc)
-    # print(xc)
+        X, kmeans, centroids, silhouette_score, WCSS, average_euclid_dist_mean = clustering.clustering_kmeans(x, nc, True)
+        # X, kmeans, centroids, avg_dist, sum_dist, average_euclid_dist_mean = clustering.clustering_birch(x, nc, True)        
+    
+    # print(avg_dist)
+    # print(sum_dist)
+    # print(average_euclid_dist_mean)
+
+    print("silhouette score: ", silhouette_score)
+
+    # quit()
+
+    # quit()
+    xc = np.transpose(centroids)
+    # xc = np.transpose(xc)   
 
     if xlabels is not None:
         xlabels = np.array(xlabels)
@@ -70,26 +78,27 @@ def run_clustering(x, nc, xheader, xlabels=None):
 
 options = [
     
+    {
+        "nc": 4,
+        "norm_sum": False,
+        "norm_axis": False
+    },
     # {
-    #     "nc": 5,
-    #     "norm_sum": False,
-    #     "norm_axis": False
-    # },
-    # {
-    #     "nc": 5,
+    #     "nc": 4,
     #     "norm_sum": True,
     #     "norm_axis": False
     # },
     # {
-    #     "nc": 5,
+    #     "nc": 4,
     #     "norm_sum": False,
     #     "norm_axis": True
     # },
     # {
-    #     "nc": 5,
+    #     "nc": 4,
     #     "norm_sum": True,
     #     "norm_axis": True
     # },
+
     # {
     #     "nc": 3,
     #     "norm_sum": False,
@@ -111,11 +120,11 @@ options = [
     #     "norm_axis": True
     # },
 
-    {
-        "nc": None,
-        "norm_sum": False,
-        "norm_axis": False
-    },
+    # {
+    #     "nc": None,
+    #     "norm_sum": False,
+    #     "norm_axis": False
+    # },
     # {
     #     "nc": None,
     #     "norm_sum": True,

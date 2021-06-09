@@ -61,6 +61,12 @@ class CMapMatrixElement:
 def plot(y, x, title, xlabel, ylabel):    
     fig = plt.figure()
     plt.plot(x, y)
+    yint = []
+    locs, labels = plt.xticks()
+    yint = x
+    # for each in locs:
+    #     yint.append(int(each))
+    plt.xticks(yint)
     set_disp(title, xlabel, ylabel)
     plt.show()
     return fig
@@ -125,7 +131,7 @@ def plot_timeseries_multi_sub2(timeseries_arrays: List[List[Timeseries]], title,
     id = 0
 
     if not figsize:
-        # fig = plt.figure(id, figsize=(9, 16))
+        # fig = plt.figure(id, figsize=(8, 6))
         fig = plt.figure(id)
     else:
         fig = plt.figure(id, figsize=figsize)
