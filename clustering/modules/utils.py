@@ -84,6 +84,42 @@ def create_timeseries(data, header, datax=None):
 
     return tss
 
+def create_timeseries_rows(data, header, datax=None):
+    tss: List[Timeseries] = []
+    # colors = ['blue', 'red', 'green', 'orange']
+    # colors = ['Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Indigo']
+
+    ck = 0
+    sdata = np.shape(data)
+    print(sdata)
+    
+    rows = sdata[0]
+    cols = sdata[1]   
+
+    colors = cm.rainbow(np.linspace(0, 1, cols))
+    # colors = cm.viridis(np.linspace(0, 1, cols))
+
+    for j in range(cols):
+        ts: Timeseries = Timeseries()
+        try:
+            ts.label = header[j]
+        except:
+            ts.label = "unknown"
+        ts.color = colors[ck]
+        ck += 1
+        if ck >= len(colors):
+            ck = 0
+
+        for i in range(rows):
+            if datax is not None:
+                ts.x.append(datax[i][j])
+            else:
+                ts.x.append(i)
+            ts.y.append(data[i][j])
+        tss.append(ts)
+        ts = None
+
+    return tss
 
 def normalize_sum_axis(a, ax=0):
     new_matrix = normalize_sum_1(a, ax)

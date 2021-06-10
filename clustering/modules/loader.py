@@ -97,5 +97,22 @@ def binarize(x):
     return x
 
 
+def save_as_csv_2d(filename, np2d):
+    data = ""
+    s = np.shape(np2d)
+    for i in range(s[0]):
+        for j in range(s[1]):
+            data += str(np2d[i][j])+","
+        data += "\n"
+    with open(filename, "w") as f:
+        f.write(data)
+
+def save_as_csv_1d(filename, np1d):
+    data = ""
+    for el in np1d:
+        data += str(el)+","
+    with open(filename, "w") as f:
+        f.write(data)
+
 if __name__ == "__main__":
     clean("./data/models/crt")

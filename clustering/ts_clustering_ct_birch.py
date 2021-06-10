@@ -8,7 +8,7 @@ from statsmodels.tsa.seasonal import seasonal_decompose
 import math
 from sklearn.metrics import silhouette_score
 
-from modules import graph
+from modules import graph, loader
 
 # import pandas as pd
 # import seaborn as sns
@@ -46,11 +46,22 @@ def getOptimalClustersKmeans(data, max_clusters):
                                     'euclidean'), axis=1)) / data.shape[0] for k in range(len(kmeanModels))]
     dist = {k: getD(n_clusters[0], distortions[0], n_clusters[max_clusters-1],
                     distortions[max_clusters-1], k, distortions[k-1]) for k in n_clusters}
+    WCSS_vect = [kmeanModels[k].inertia_ for k in range(len(kmeanModels))]
+    print(WCSS_vect)
     # plt.plot(distortions)
     # plt.show()
 
+
     fig = graph.plot(distortions, list(n_clusters), "Optimal number of clusters", "Number of clusters", "Distortion")
-    graph.save_figure(fig, "./figs/eval_trends_dist.png")
+    graph.save_figure(fig, "./figs/eval_dist.png")
+    print(distortions)
+    loader.save_as_csv_1d("clusters_dist.csv", distortions)
+
+    fig = graph.plot(WCSS_vect, list(n_clusters), "Optimal number of clusters", "Number of clusters", "WCSS")
+    graph.save_figure(fig, "./figs/eval_inertia.png")
+    print(WCSS_vect)
+    loader.save_as_csv_1d("clusters_inertia.csv", WCSS_vect)
+    quit()
 
     optimalClusters = max(dist, key=dist.get)
     return optimalClusters
@@ -108,8 +119,8 @@ def BirchClustering(X, n_clusters=20):
 # python3.7 ts_clustering.py water_avg_weekly.csv 100 20
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        # fn = "data/Water weekly/water_avg_weekly.csv"
-        fn = "data/Water weekly/water_avg_weekly_trends.csv"
+        fn = "data/Water weekly/water_avg_weekly.csv"
+        # fn = "data/Water weekly/water_avg_weekly_trends.csv"
         samples = 100
         n_clusters = 20
     else:
@@ -122,23 +133,23 @@ if __name__ == "__main__":
     X_Kmeans = df.iloc[:, 3:]
 
     # K-Means
-    # clusters, centers, optimalClusters = KMeansClustering(
-    #     X_Kmeans, n_clusters=n_clusters)
-    # values = np.unique(clusters)
-    # for idx in range(0, optimalClusters):
-    #     TSAnalysis(centers[idx])
+    clusters, centers, optimalClusters = KMeansClustering(
+        X_Kmeans, n_clusters=n_clusters)
+    values = np.unique(clusters)
+    for idx in range(0, optimalClusters):
+        TSAnalysis(centers[idx])
 
-    # print(silhouette_score(X_Kmeans, clusters))
+    print(silhouette_score(X_Kmeans, clusters))
 
-    # quit()
+    quit()
 
-    # plt.figure()
-    # for idx in range(0, optimalClusters):
-    #     plt.plot(centers[idx], label='C'+str(idx+1))
-    # plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='lower left',
-    #            ncol=optimalClusters, mode="expand", borderaxespad=0.)
-    # plt.show()
-    # plt.close()
+    plt.figure()
+    for idx in range(0, optimalClusters):
+        plt.plot(centers[idx], label='C'+str(idx+1))
+    plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='lower left',
+               ncol=optimalClusters, mode="expand", borderaxespad=0.)
+    plt.show()
+    plt.close()
 
 
     # Birch
