@@ -11,6 +11,11 @@ import math
 import copy
 from colour import Color
 
+import matplotlib as mpl
+from svgpath2mpl import parse_path
+from xml.dom import minidom
+from matplotlib.ticker import MaxNLocator
+
 
 # FSIZE_TITLE = 16
 # FSIZE_LABEL = 14
@@ -23,6 +28,7 @@ FSIZE_LABEL = 14
 FSIZE_LABEL_S = 14
 FSIZE_LABEL_XS = 12
 OPACITY = 0.9
+OPACITY = 1
 
 
 class Timeseries:
@@ -58,7 +64,8 @@ class CMapMatrixElement:
 #     x = []
 #     y = []
 
-def plot(y, x, title, xlabel, ylabel):    
+
+def plot(y, x, title, xlabel, ylabel):
     fig = plt.figure()
     plt.plot(x, y)
     yint = []
@@ -70,6 +77,7 @@ def plot(y, x, title, xlabel, ylabel):
     set_disp(title, xlabel, ylabel)
     plt.show()
     return fig
+
 
 def plot_xy(x, y, rads, labels, colors, title, xlabel, ylabel, scale, show_legend, labels_points):
     fig, ax = plt.subplots()
@@ -97,7 +105,8 @@ def plot_xy(x, y, rads, labels, colors, title, xlabel, ylabel, scale, show_legen
             color = "white"
         else:
             color = "black"
-        ax.annotate(txt, (y[i], x[i]), size=14, ha='center', va='center', color=color)
+        ax.annotate(txt, (y[i], x[i]), size=14,
+                    ha='center', va='center', color=color)
 
     ax.tick_params(axis='both', which='major', labelsize=FSIZE_LABEL_XS)
     ax.tick_params(axis='both', which='minor', labelsize=FSIZE_LABEL_XS)
@@ -118,7 +127,6 @@ def plot_xy(x, y, rads, labels, colors, title, xlabel, ylabel, scale, show_legen
         yticks[0].label1.set_visible(False)
         yticks[1].label1.set_visible(False)
 
-    
     set_disp(title, xlabel, ylabel)
 
     plt.show()
@@ -126,7 +134,7 @@ def plot_xy(x, y, rads, labels, colors, title, xlabel, ylabel, scale, show_legen
     return fig
 
 
-def plot_timeseries_multi_sub2(timeseries_arrays: List[List[Timeseries]], title, xlabel, ylabel, figsize, ndivx, ndiv, xlabels = None):
+def plot_timeseries_multi_sub2(timeseries_arrays: List[List[Timeseries]], title, xlabel, ylabel, figsize, ndivx, ndiv, xlabels=None):
     matplotlib.style.use('default')
     id = 0
 
@@ -135,7 +143,7 @@ def plot_timeseries_multi_sub2(timeseries_arrays: List[List[Timeseries]], title,
         fig = plt.figure(id)
     else:
         fig = plt.figure(id, figsize=figsize)
-        
+
     n_sub = len(timeseries_arrays)
     ndata = 0
 
@@ -165,7 +173,7 @@ def plot_timeseries_multi_sub2(timeseries_arrays: List[List[Timeseries]], title,
     if ndiv is None:
         if ndivx is not None:
             ndiv = int(ndata / ndivx)
-    
+
     if ndiv is not None:
         ax.set_xticks(ax.get_xticks()[::ndiv])
 
@@ -454,6 +462,122 @@ def plot_barchart_multi_core(bss: List[Barseries], xlabel, ylabel, title, xlabel
     return fig, ax
 
 
+def plot_barchart_multi_core_raw(data, colors, labels, xlabel, ylabel, title, xlabels, limits, show, offset, bcount, legend_loc):
+
+    fig, ax = plt.subplots(figsize=(10, 8))
+
+    # ax = plt.gca()
+    ax.tick_params(axis='both', which='major', labelsize=FSIZE_LABEL_XS)
+    ax.tick_params(axis='both', which='minor', labelsize=FSIZE_LABEL_XS)
+
+    n_groups = len(data)
+
+    if bcount != 0:
+        bar_width = 1 / (bcount + 1)
+    else:
+        bar_width = 1 / (n_groups + 1)
+
+    bar_width = 1
+
+    if offset is None:
+        # offset = -1 / (n_groups * 2 * bar_width + 1)
+        if n_groups == 2:
+            offset = bar_width / 2
+        else:
+            # offset = -bar_width / n_groups
+            offset = -1 / ((n_groups + 1) / 2) - bar_width
+            # offset = 0
+            # offset = -1 / ((n_groups + 1) / 2) + bar_width*3/2
+            # pass
+    offset = 0
+
+    opacity = OPACITY
+
+    low = None
+    high = None
+
+    for i in range(n_groups):
+
+        print("plotting index: " + str(i))
+
+        index = np.arange(len(data[i]))
+
+        if len([d for d in data[i] if d != 0]) != 0:
+            low1 = min([d for d in data[i] if d != 0])
+        else:
+            low1 = None
+
+        high1 = max(data[i])
+
+        if low is None:
+            low = low1
+            high = high1
+
+        if low1 is not None:
+            if low1 < low:
+                low = low1
+        if high1 is not None:
+            if high1 > high:
+                high = high1
+
+        rb = plt.bar(
+            index + offset,
+            data[i],
+            bar_width,
+            alpha=opacity,
+            color=colors[i] if colors is not None else None,
+            label=labels[i],
+            zorder=3)
+
+    plt.xlabel(xlabel, fontsize=FSIZE_LABEL)
+    plt.ylabel(ylabel, fontsize=FSIZE_LABEL)
+    plt.title(title, fontsize=FSIZE_TITLE)
+
+    if n_groups == 1:
+        plt.xticks(index, xlabels)
+    else:
+        plt.xticks(index + bar_width, xlabels)
+
+    if not legend_loc:
+        legend_loc = "upper left"
+
+    plt.legend(loc=legend_loc, fontsize=FSIZE_LABEL_XS)
+
+    plt.xticks(rotation=0)
+
+    ax.grid(zorder=0)
+
+    print("low limit: ", low)
+    print("high limit: ", high)
+    # plt.ylim([math.ceil(low-0.5*(high-low)), math.ceil(high+0.5*(high-low))])
+    # plt.ylim([math.ceil(low-0.005*(high-low)), math.ceil(high+0.005*(high-low))])
+    # plt.ylim([low, high])
+
+    # kscale = 0.25
+    kscale = 0.1
+
+    if limits is not None:
+        low = limits[0]
+        high = limits[1]
+    else:
+        high += kscale * high
+        low -= kscale * low
+
+    ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
+
+    plt.ylim([low, high])
+
+    # set_fontsize()
+    plt.tight_layout()
+
+    if show:
+        print("show")
+        plt.show()
+
+    return fig, ax
+
+
 def set_fontsize():
     # SMALL_SIZE = 20
     # MEDIUM_SIZE = 24
@@ -470,33 +594,35 @@ def set_fontsize():
     matplotlib.rcParams.update({'font.size': 16})
 
 
-def plot_barchart(labels, values, xlabel, ylabel, title, color):
+def plot_barchart(labels, values, xlabel, ylabel, title, color, limits, figsize):
+    matplotlib.style.use('default')
+    id = 0
 
-    fig = plt.figure()
+    if not figsize:
+        # fig = plt.figure(id, figsize=(8, 6))
+        fig = plt.figure(id)
+    else:
+        fig = plt.figure(id, figsize=figsize)
 
     y_pos = np.arange(len(labels))
-
+    plt.rc('axes', axisbelow=True)
     plt.bar(y_pos, values, align='center', alpha=OPACITY, color=color)
     plt.xticks(y_pos, labels)
-
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-
     low = min(values)
     high = max(values)
-
-    print(low)
-    print(high)
-    # plt.ylim([math.ceil(low-0.5*(high-low)), math.ceil(high+0.5*(high-low))])
-    # plt.ylim([math.ceil(low-0.005*(high-low)), math.ceil(high+0.005*(high-low))])
-    plt.ylim([low - 0.005*low, high + 0.005*high])
-
-    plt.title(title)
-
+    if limits is not None:
+        plt.ylim(limits[0], limits[1])
+    else:
+        plt.ylim([math.ceil(low-0.5*(high-low)),
+                  math.ceil(high+0.5*(high-low))])
+        # plt.ylim([math.ceil(low-0.005*(high-low)), math.ceil(high+0.005*(high-low))])
+        # plt.ylim([low - 0.5*low, high + 0.5*high])
+    plt.grid(zorder=0)
+    set_disp(title, xlabel, ylabel)
     fig = plt.gcf()
-
     plt.show()
-
     return fig
 
 
@@ -745,9 +871,8 @@ def plot_matrix_cmap_plain(elements: List[CMapMatrixElement], xsize, ysize, titl
         c[1] = rgb[1]
         c[2] = rgb[2]
         c[3] = alpha
- 
-        colors.append(tuple(c))
 
+        colors.append(tuple(c))
 
     cmap = matplotlib.colors.ListedColormap(colors, name='my_name')
 
@@ -853,7 +978,7 @@ def hsv2rgb(h, s, v):
         r, g, b = t, p, v
     elif hi == 5:
         r, g, b = v, p, q
-  
+
     return r, g, b
 
 
@@ -876,3 +1001,109 @@ def rgb2hsv(r, g, b):
         s = df/mx
     v = mx
     return h, s, v
+
+
+def discrete_cmap(N, base_cmap=None):
+    """
+    Create an N-bin discrete colormap from the specified input map
+    """
+    # Note that if base_cmap is a string or None, you can simply do
+    #    return plt.cm.get_cmap(base_cmap, N)
+    # The following works for string, None, or a colormap instance:
+
+    base = plt.cm.get_cmap(base_cmap)
+    color_list = base(np.linspace(0, 1, N))
+    cmap_name = base.name + str(N)
+    return base.from_list(cmap_name, color_list, N)
+
+
+def create_discrete_cmap(data):
+    # cmap = discrete_cmap(len(data)+2, 'hsv')
+    # cmap = discrete_cmap(len(data) + 2, 'nipy_spectral')
+    cmap = discrete_cmap(len(data) + 2, 'jet')
+    return cmap
+
+
+def plot_map_features(place_coords, item_coords, colors, starts, ends, zoom_out, labels, sizes):
+    # Plotting of the routes in matplotlib.
+    figsize = (10, 8)
+
+    fig = plt.figure(figsize=figsize)
+
+    set_plot_font()
+
+    ax = fig.add_subplot(111)
+
+    icon_path = "signal.svg"
+    doc = minidom.parse(icon_path)  # parseString also exists
+    path_strings = [path.getAttribute('d') for path
+                    in doc.getElementsByTagName('path')]
+
+    smiley = parse_path("""m 739.01202,391.98936 c 13,26 13,57 9,85 -6,27 -18,52 -35,68 -21,20 -50,23 -77,18 -15,-4 -28,-12 -39,-23 -18,-17 -30,-40 -36,-67 -4,-20 -4,-41 0,-60 l 6,-21 z m -302,-1 c 2,3 6,20 7,29 5,28 1,57 -11,83 -15,30 -41,52 -72,60 -29,7 -57,0 -82,-15 -26,-17 -45,-49 -50,-82 -2,-12 -2,-33 0,-45 1,-10 5,-26 8,-30 z M 487.15488,66.132209 c 121,21 194,115.000001 212,233.000001 l 0,8 25,1 1,18 -481,0 c -6,-13 -10,-27 -13,-41 -13,-94 38,-146 114,-193.000001 45,-23 93,-29 142,-26 z m -47,18 c -52,6 -98,28.000001 -138,62.000001 -28,25 -46,56 -51,87 -4,20 -1,57 5,70 l 423,1 c 2,-56 -39,-118 -74,-157 -31,-34 -72,-54.000001 -116,-63.000001 -11,-2 -38,-2 -49,0 z m 138,324.000001 c -5,6 -6,40 -2,58 3,16 4,16 10,10 14,-14 38,-14 52,0 15,18 12,41 -6,55 -3,3 -5,5 -5,6 1,4 22,8 34,7 42,-4 57.6,-40 66.2,-77 3,-17 1,-53 -4,-59 l -145.2,0 z m -331,-1 c -4,5 -5,34 -4,50 2,14 6,24 8,24 1,0 3,-2 6,-5 17,-17 47,-13 58,9 7,16 4,31 -8,43 -4,4 -7,8 -7,9 0,0 4,2 8,3 51,17 105,-20 115,-80 3,-15 0,-43 -3,-53 z m 61,-266 c 0,0 46,-40 105,-53.000001 66,-15 114,7 114,7 0,0 -14,76.000001 -93,95.000001 -76,18 -126,-49 -126,-49 z""")
+    smiley = parse_path(path_strings[0])
+    # for ps in path_strings:
+    #     pp = parse_path(ps)
+    #     codes = pp.codes
+    #     verts = pp.vertices
+    #     codes = codes.tolist()
+    #     verts = verts.tolist()
+    #     # quit()
+    # smiley = matplotlib.Path(verts, codes)
+    smiley.vertices -= smiley.vertices.mean(axis=0)
+
+    marker = smiley
+    marker = marker.transformed(mpl.transforms.Affine2D().rotate_deg(180))
+
+    valid_series = 0
+    for i, item in enumerate(item_coords):
+        if len(item_coords[item]) > 0:
+            valid_series += 1
+
+    markerface = ['y.', 'g.', 'b.']
+    for i, item in enumerate(item_coords):
+        if len(item_coords[item]) > 0:
+            clat, clon = zip(*[c for c in item_coords[item]])
+            # markerface[i % len(colors)]
+            ax.plot(clon, clat, '.', color=colors[i], markersize=sizes[i])
+
+    if len(place_coords) > 0:
+        # Plot all the nodes as black dots.
+        clat, clon = zip(*[c for c in place_coords])
+        ax.plot(clon, clat, 'm.', color=colors[len(
+            colors)-1], marker=marker, markersize=20)
+
+    # ax.plot(clon, clat, 'b.', markersize=20)
+
+    # ax.plot(clon, clat, 'b.', markersize=20)
+    # plot the routes as arrows
+
+    labels_valid = []
+
+    for idx in range(valid_series):
+        labels_valid.append(labels[idx])
+
+    # labels_valid.append("O")
+
+    lgnd = ax.legend(labels_valid)
+
+    # change the marker size manually
+    for handle in lgnd.legendHandles:
+        handle._legmarker.set_markersize(10)
+        handle._legmarker.set_markersize(10)
+
+    xlim = ax.get_xlim()
+    ylim = ax.get_ylim()
+    # example of how to zoomout by a factor of 0.1
+    factor = zoom_out
+    new_xlim = (xlim[0] + xlim[1])/2 + np.array((-0.5, 0.5)) * \
+        (xlim[1] - xlim[0]) * (1 + factor)
+    ax.set_xlim(new_xlim)
+    new_ylim = (ylim[0] + ylim[1])/2 + np.array((-0.5, 0.5)) * \
+        (ylim[1] - ylim[0]) * (1 + factor)
+    ax.set_ylim(new_ylim)
+
+    plt.grid(zorder=0)
+    set_disp("DMS fill", "longitude", "latitude")
+
+    plt.show()
+    return fig
