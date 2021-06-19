@@ -65,17 +65,22 @@ class CMapMatrixElement:
 #     y = []
 
 
-def plot(y, x, title, xlabel, ylabel):
-    fig = plt.figure()
-    plt.plot(x, y)
+def plot(y, x, title, xlabel, ylabel, show):
+    fig = plt.figure(figsize=(8,6))
+    if x is None:
+        plt.plot(y)
+    else:
+        plt.plot(x, y)
     yint = []
+    plt.grid()
     locs, labels = plt.xticks()
     yint = x
     # for each in locs:
     #     yint.append(int(each))
     plt.xticks(yint)
     set_disp(title, xlabel, ylabel)
-    plt.show()
+    if show:
+        plt.show()
     return fig
 
 
@@ -308,7 +313,7 @@ def set_disp_ax(ax, title, xlabel, ylabel):
 
 def set_disp(title, xlabel, ylabel):
     if title:
-        plt.gca().set_title(title, fontsize=FSIZE_TITLE)
+        plt.gca().set_title(title, fontsize=FSIZE_TITLE, pad=10)
     if xlabel:
         plt.xlabel(xlabel, fontsize=FSIZE_LABEL)
     if ylabel:

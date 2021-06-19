@@ -117,25 +117,33 @@ if __name__ == "__main__":
         X_containers[elem].insert(0, "clusters", clusters)
         X_containers[elem].insert(0, "stdev", clusters)
 
-        norm = np.linalg.norm(centers)
-        centers = centers / norm
-
         # plot centers
         if plot_centers:
-            plt.figure(figsize=(8, 6))
+            # plt.figure(figsize=(8, 6))
+            fig = plt.figure()
+            graph.set_plot_font()
             for idx in range(0, n_clusters):
                 plt.plot(centers[idx], label='C'+str(idx+1), color=colors[idx])
-            plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='lower left',
-                       ncol=n_clusters, mode="expand", borderaxespad=0.)
+            # plt.legend(bbox_to_anchor=(0., 1.02, 1., .102), loc='lower left',
+            #            ncol=n_clusters, mode="expand", borderaxespad=0.)
+            plt.legend(loc="upper left", fontsize=graph.FSIZE_LABEL_XS)
             # plt.legend(loc='right', ncol=n_clusters)
-            plt.title("zone " + str(i+1) + " clusters")
+            plt.grid(zorder=0)
+            graph.set_disp("zone " + str(i+1) + " clusters",
+                           "x [hours]", "y [L/h]")
             plt.show()
+            graph.save_figure(
+                fig, "./figs/map_cluster_zone_" + str(i+1) + ".png")
+
+        norm = np.linalg.norm(centers)
+        centers = centers / norm
 
         stdev_clusters_1 = []
         stdev_coords_1 = []
 
         # Analyze the TS for each center
         for idx in range(0, n_clusters):
+            # TSAnalysis(centers[idx])
             result = TSAnalysisGetSeasonal(centers[idx])
             stdev = statistics.stdev(result)
             # print(stdev)
@@ -154,8 +162,10 @@ if __name__ == "__main__":
             stdev_coords_1.append(avg_coords)
 
             if plot_seasonal:
-                plt.plot(result)
-                plt.show()
+                fig = graph.plot(result, None, "zone " + str(i+1) + " cluster " + str(idx) + " seasonal",
+                           "x [hours]", "y [normalized]", False)
+                graph.save_figure(
+                    fig, "./figs/map_cluster_seasonal_"+str(i+1)+"_" + str(idx) + ".png")
 
         stdev_clusters[elem] = stdev_clusters_1
         stdev_coords[elem] = stdev_coords_1
@@ -259,6 +269,6 @@ if __name__ == "__main__":
     print(X_centers_vect)
 
     fig = graph.plot_map_features(X_centers_vect, stdev_coords_by_stdev,
-                            colors_plot, None, None, 0.1, labels, sizes)
+                                  colors_plot, None, None, 0.1, labels, sizes)
 
     graph.save_figure(fig, "./figs/map_cluster_result.png")
