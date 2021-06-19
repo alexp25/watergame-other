@@ -191,13 +191,17 @@ if __name__ == "__main__":
     stdev_min = np.min(stdev_min)
     stdev_max = np.max(stdev_max)
 
-    stdev_min *= 1.1
-    stdev_max *= 1.1
+    # stdev_min *= 1.1
+    # stdev_max *= 1.1
 
     # compute levels for stdev reclustering
-    levels = np.linspace(stdev_min, stdev_max, n_clusters)
+    levels = np.linspace(stdev_min, stdev_max, n_clusters + 1)
     print(stdev_min, stdev_max)
     print(levels)
+    levels = levels[1:]
+    print(levels)
+    # recompute levels as exactly mid-levels (half distance between each original level)
+    quit()
     # levels = [0.001, 0.01, 0.02, 0.05]
     levels = -np.sort(-levels)
 
@@ -206,6 +210,7 @@ if __name__ == "__main__":
     for level_idx, level in enumerate(levels):
         stdev_coords_by_stdev[str(level_idx)] = []
 
+    # quit()
     new_assignments = []
     for k in stdev_clusters:
         for i, elem in enumerate(stdev_clusters[k]):
