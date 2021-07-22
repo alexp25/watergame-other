@@ -6,7 +6,7 @@ import sys
 from statsmodels.tsa.seasonal import seasonal_decompose
 from matplotlib import rcParams
 import matplotlib
-from modules import graph
+from modules import graph, utils
 import statistics
 
 
@@ -26,6 +26,7 @@ colors = {
 }
 
 labels = ["A", "B", "C", "D"]
+labels.reverse()
 sizes = [10, 50, 100, 200]
 sizes.reverse()
 
@@ -42,7 +43,7 @@ def TSAnalysisGetSeasonal(series, seasonal=24, robust=False):
 
 
 def KMeansClustering(X, n_clusters=5):
-    model = KMeans(n_clusters=n_clusters)
+    model = KMeans(n_clusters=n_clusters, random_state=0)
     clusters = model.fit_predict(X)
     centers = model.cluster_centers_
     return clusters, centers
@@ -79,6 +80,8 @@ if __name__ == "__main__":
     plot_centers = False
     plot_seasonal = False
     plot_hist = True
+    plot_average_stdev = False
+    split_stdev_by_zone = True
 
     X_ts = {}
     X_coords = {}
@@ -89,6 +92,7 @@ if __name__ == "__main__":
     X_coords_clusters = {}
 
     stdev_clusters = {}
+    stdev_clusters_avg = {}
     stdev_coords = {}
 
     X_containers = {}
@@ -163,10 +167,11 @@ if __name__ == "__main__":
 
             if plot_seasonal:
                 fig = graph.plot(result, None, "zone " + str(i+1) + " cluster " + str(idx) + " seasonal",
-                           "x [hours]", "y [normalized]", False)
+                                 "x [hours]", "y [normalized]", False)
                 graph.save_figure(
                     fig, "./figs/map_cluster_seasonal_"+str(i+1)+"_" + str(idx) + ".png")
 
+        stdev_clusters_avg[elem] = np.mean(stdev_clusters_1)
         stdev_clusters[elem] = stdev_clusters_1
         stdev_coords[elem] = stdev_coords_1
 
@@ -182,98 +187,74 @@ if __name__ == "__main__":
     stdev_min = []
     stdev_max = []
 
+    levels_zones = {}
+
     # get min max stdev
     for sd in stdev_clusters:
         sdc = stdev_clusters[sd]
-        stdev_min.append(np.min(sdc))
-        stdev_max.append(np.max(sdc))
+        stdev_min_zone = np.min(sdc)
+        stdev_max_zone = np.max(sdc)
+        levels_zones[sd] = utils.get_levels(stdev_min_zone, stdev_max_zone, n_clusters + 1)
+        stdev_min.append(stdev_min_zone)
+        stdev_max.append(stdev_max_zone)
 
     stdev_min = np.min(stdev_min)
     stdev_max = np.max(stdev_max)
 
-    # stdev_min *= 1.1
-    # stdev_max *= 1.1
-
     # compute levels for stdev reclustering
-    levels = np.linspace(stdev_min, stdev_max, n_clusters + 1)
-    print(stdev_min, stdev_max)
+    levels = utils.get_levels(stdev_min, stdev_max, n_clusters + 1)
     print(levels)
-    levels = levels[1:]
-    print(levels)
-    # recompute levels as exactly mid-levels (half distance between each original level)
-    quit()
-    # levels = [0.001, 0.01, 0.02, 0.05]
-    levels = -np.sort(-levels)
 
-    # recluster by stdev level
-    stdev_coords_by_stdev = {}
-    for level_idx, level in enumerate(levels):
-        stdev_coords_by_stdev[str(level_idx)] = []
+    # recluster by stdev level global
+    stdev_coords_by_stdev, new_assignments = utils.assign_levels(
+        stdev_clusters, stdev_coords, levels)
+    d_vect = utils.check_hist(new_assignments, levels)
 
+    # recluster by stdev level by zone
+    stdev_coords_by_stdev_by_zone, new_assignments_by_zone = utils.assign_levels_by_zones(
+        stdev_clusters, stdev_coords, levels_zones)
+    d_vect_zone = utils.check_hist(new_assignments_by_zone, levels)
+    print(levels_zones)
+    print(new_assignments_by_zone)
+    print(stdev_coords_by_stdev_by_zone)
+
+    print(d_vect)
+    print(d_vect_zone)
     # quit()
-    new_assignments = []
-    for k in stdev_clusters:
-        for i, elem in enumerate(stdev_clusters[k]):
-            elem_adj = "0"
-            for level_idx, level in enumerate(levels):
-                if elem < level:
-                    elem_adj = str(len(levels) - level_idx - 1)
-            new_assignments.append(int(elem_adj))
-            print(elem_adj)
-            elem_coord = stdev_coords[k][i]
-            stdev_coords_by_stdev[elem_adj].append(elem_coord)
-
-    # print(stdev_coords_by_stdev)
-    # print("\n\n")
-
-    print(new_assignments)
-    # labels = [str(level) for level in range(len(levels))]
-    # labels
-
-    d = {}
-    for elem in new_assignments:  # pass through all the characters in the string
-        if d.get(elem):  # verify if the character exists in the dictionary
-            d[elem] += 1  # if it exist add 1 to the value for that character
-        else:  # if it doesn’t exist initialize a new key with the value of the character
-            d[elem] = 1  # and initialize the value (which is the counter) to 1
-
-    d_vect = []
-    for level in range(len(levels)):
-        d_vect.append(d[level])
-
-    # cmap = matplotlib.cm.get_cmap('viridis')
-    # color_scheme = [cmap(i) for i in np.linspace(0, 1, len(levels))]
-    # print(color_scheme)
 
     colors_map = graph.create_discrete_cmap(levels)
-    # colors_map = matplotlib.cm.get_cmap('viridis')
     colors_plot = [colors_map(i+1) for i in range(len(levels))]
     colors_plot = list(reversed(colors_plot))
-    # colors_plot = list(colors_plot)
 
-    split_d_vect = []
-    for i, d in enumerate(d_vect):
-        d_vect_new = []
-        for i1, d1 in enumerate(d_vect):
-            if i1 == i:
-                d_vect_new.append(d)
-            else:
-                d_vect_new.append(0)
-        split_d_vect.append(d_vect_new)
-
+    max_d = 0
+    if split_stdev_by_zone:
+        split_d_vect = utils.get_split_d_vect(d_vect_zone)
+        max_d = np.max(d_vect_zone) + 1
+    else:
+        split_d_vect = utils.get_split_d_vect(d_vect)
+        max_d = np.max(d_vect) + 1
+  
     if plot_hist:
-        # fig = graph.plot_barchart(labels, d_vect, "Cluster", "Assignments", "Clustering distribution", "b", [0, 18], None)
         fig, _ = graph.plot_barchart_multi_core_raw(split_d_vect, colors_plot, labels, "Cluster", "Assignment count",
-                                                    "Clustering distribution", None, [0, 18], True, None, 0, None)
-
-        graph.save_figure(fig, "./figs/map_cluster_hist.png")
+                                                    "Clustering distribution", None, [0, max_d], True, None, 0, None)
+        if split_stdev_by_zone:
+            graph.save_figure(fig, "./figs/map_cluster_hist_zones.png")
+        else:
+            graph.save_figure(fig, "./figs/map_cluster_hist.png")
 
     series = [str(i+1) for i in range(len(X_centers_vect))]
 
-    print("\n")
-    print(X_centers_vect)
-
-    fig = graph.plot_map_features(X_centers_vect, stdev_coords_by_stdev,
-                                  colors_plot, None, None, 0.1, labels, sizes)
-
-    graph.save_figure(fig, "./figs/map_cluster_result.png")
+    if split_stdev_by_zone:
+        fig = graph.plot_map_features(X_centers_vect, stdev_coords_by_stdev_by_zone,
+                                    colors_plot, None, None, 0.1, labels, sizes, "Map results")       
+        graph.save_figure(fig, "./figs/map_cluster_result_zones.png")
+    else:
+        if plot_average_stdev:
+            stdev_coords_by_stdev = utils.assign_levels_1d(
+                stdev_clusters_avg, X_centers_vect, levels)
+        fig = graph.plot_map_features(X_centers_vect, stdev_coords_by_stdev,
+                                  colors_plot, None, None, 0.1, labels, sizes, "Map results")
+        if plot_average_stdev:
+            graph.save_figure(fig, "./figs/map_cluster_result_global.png")
+        else:
+            graph.save_figure(fig, "./figs/map_cluster_result.png")

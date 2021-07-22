@@ -145,3 +145,116 @@ def normalize_axis_01(a, ax=0):
             new_matrix[i][j] = (a[i][j] - min_vals[i]) / (max_vals[i] - min_vals[i])
     new_matrix = np.nan_to_num(new_matrix) 
     return new_matrix
+
+
+def get_levels(stdev_min, stdev_max, n_clusters):
+    # stdev_min *= 1.1
+    # stdev_max *= 1.1
+    # compute levels for stdev reclustering
+    levels = np.linspace(stdev_min, stdev_max, n_clusters)
+    # print(stdev_min, stdev_max)
+    # print(levels)
+    levels = levels[1:]
+    # print(levels)
+    # recompute levels as exactly mid-levels (half distance between each original level)
+    # levels = [0.001, 0.01, 0.02, 0.05]
+    levels = -np.sort(-levels)
+    return levels
+
+def assign_levels(stdev_clusters, stdev_coords, levels):
+    # recluster by stdev level
+    stdev_coords_by_stdev = {}
+    for level_idx, level in enumerate(levels):
+        stdev_coords_by_stdev[str(level_idx)] = []
+
+    new_assignments = []
+    for k in stdev_clusters:
+        for i, elem in enumerate(stdev_clusters[k]):
+            elem_adj = "0"
+            for level_idx, level in enumerate(levels):
+                if elem < level:
+                    elem_adj = str(len(levels) - level_idx - 1)
+            new_assignments.append(int(elem_adj))
+            # print(elem_adj)
+            if stdev_coords is not None:
+                elem_coord = stdev_coords[k][i]
+                stdev_coords_by_stdev[elem_adj].append(elem_coord)
+
+    return stdev_coords_by_stdev, new_assignments
+
+def assign_levels_by_zones(stdev_clusters, stdev_coords, levels_zones):
+    # recluster by stdev level
+    stdev_coords_by_stdev = {}
+    keys = list(levels_zones)
+    for level_idx, level in enumerate(levels_zones[keys[0]]):
+        stdev_coords_by_stdev[str(level_idx)] = []
+
+    new_assignments = []
+    for k in stdev_clusters:
+        for i, elem in enumerate(stdev_clusters[k]):
+            elem_adj = "0"
+            for level_idx, level in enumerate(levels_zones[k]):
+                if elem < level:
+                    elem_adj = str(len(levels_zones[k]) - level_idx - 1)
+            new_assignments.append(int(elem_adj))
+            # print(elem_adj)
+            if stdev_coords is not None:
+                elem_coord = stdev_coords[k][i]
+                stdev_coords_by_stdev[elem_adj].append(elem_coord)
+
+    return stdev_coords_by_stdev, new_assignments
+
+def check_hist(new_assignments, levels):
+    d = {}
+    for elem in new_assignments:  # pass through all the characters in the string
+        if d.get(elem):  # verify if the character exists in the dictionary
+            d[elem] += 1  # if it exist add 1 to the value for that character
+        else:  # if it doesn’t exist initialize a new key with the value of the character
+            d[elem] = 1  # and initialize the value (which is the counter) to 1
+
+    d_vect = []
+    for level in range(len(levels)):
+        try:
+            d_vect.append(d[level])
+        except:
+            d_vect.append(-1)
+    return d_vect
+
+def assign_levels_1d(stdev_clusters, stdev_coords, levels):
+    # recluster by stdev level
+    stdev_coords_by_stdev = {}
+    for level_idx, level in enumerate(levels):
+        stdev_coords_by_stdev[str(level_idx)] = []
+
+    new_assignments = []
+    for i, k in enumerate(stdev_clusters):
+        elem = stdev_clusters[k]
+        elem_adj = "0"
+        for level_idx, level in enumerate(levels):
+            if elem < level:
+                elem_adj = str(len(levels) - level_idx - 1)
+        # print(elem)
+        # print(int(elem_adj))
+        new_assignments.append(int(elem_adj))
+        if stdev_coords is not None:
+            elem_coord = stdev_coords[i]
+            stdev_coords_by_stdev[elem_adj].append(elem_coord)
+
+    # print(new_assignments)
+
+    # labels = [str(level) for level in range(len(levels))]
+    # labels
+
+    return stdev_coords_by_stdev
+
+def get_split_d_vect(d_vect):
+    split_d_vect = []
+    for i, d in enumerate(d_vect):
+        d_vect_new = []
+        for i1, d1 in enumerate(d_vect):
+            if i1 == i:
+                d_vect_new.append(d)
+            else:
+                d_vect_new.append(0)
+        split_d_vect.append(d_vect_new)
+    return split_d_vect

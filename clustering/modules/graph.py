@@ -1029,7 +1029,7 @@ def create_discrete_cmap(data):
     return cmap
 
 
-def plot_map_features(place_coords, item_coords, colors, starts, ends, zoom_out, labels, sizes):
+def plot_map_features(place_coords, item_coords, colors, starts, ends, zoom_out, labels, sizes, title):
     # Plotting of the routes in matplotlib.
     figsize = (10, 8)
 
@@ -1059,10 +1059,10 @@ def plot_map_features(place_coords, item_coords, colors, starts, ends, zoom_out,
     marker = smiley
     marker = marker.transformed(mpl.transforms.Affine2D().rotate_deg(180))
 
-    valid_series = 0
+    valid_series = []
     for i, item in enumerate(item_coords):
         if len(item_coords[item]) > 0:
-            valid_series += 1
+            valid_series.append(i)
 
     markerface = ['y.', 'g.', 'b.']
     for i, item in enumerate(item_coords):
@@ -1084,7 +1084,7 @@ def plot_map_features(place_coords, item_coords, colors, starts, ends, zoom_out,
 
     labels_valid = []
 
-    for idx in range(valid_series):
+    for idx in valid_series:
         labels_valid.append(labels[idx])
 
     # labels_valid.append("O")
@@ -1108,7 +1108,7 @@ def plot_map_features(place_coords, item_coords, colors, starts, ends, zoom_out,
     ax.set_ylim(new_ylim)
 
     plt.grid(zorder=0)
-    set_disp("DMS fill", "longitude", "latitude")
+    set_disp(title, "longitude", "latitude")
 
     plt.show()
     return fig
