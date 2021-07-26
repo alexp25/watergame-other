@@ -153,9 +153,8 @@ def get_levels(stdev_min, stdev_max, n_clusters):
     # compute levels for stdev reclustering
     levels = np.linspace(stdev_min, stdev_max, n_clusters)
     # print(stdev_min, stdev_max)
-    # print(levels)
+    print(levels)
     levels = levels[1:]
-    # print(levels)
     # recompute levels as exactly mid-levels (half distance between each original level)
     # levels = [0.001, 0.01, 0.02, 0.05]
     levels = -np.sort(-levels)
@@ -191,17 +190,18 @@ def assign_levels_by_zones(stdev_clusters, stdev_coords, levels_zones):
 
     new_assignments = []
     for k in stdev_clusters:
+        # print(k)
         for i, elem in enumerate(stdev_clusters[k]):
             elem_adj = "0"
             for level_idx, level in enumerate(levels_zones[k]):
-                if elem < level:
+                if elem <= level:
                     elem_adj = str(len(levels_zones[k]) - level_idx - 1)
             new_assignments.append(int(elem_adj))
             # print(elem_adj)
             if stdev_coords is not None:
                 elem_coord = stdev_coords[k][i]
                 stdev_coords_by_stdev[elem_adj].append(elem_coord)
-
+    # quit()
     return stdev_coords_by_stdev, new_assignments
 
 def check_hist(new_assignments, levels):

@@ -6,7 +6,7 @@ import sys
 from statsmodels.tsa.seasonal import seasonal_decompose
 from matplotlib import rcParams
 import matplotlib
-from modules import graph, utils
+from modules import graph, utils, clustering, clustering_gen
 import statistics
 
 
@@ -31,30 +31,6 @@ sizes = [10, 50, 100, 200]
 sizes.reverse()
 
 
-def TSAnalysis(series, seasonal=24, robust=False):
-    result = seasonal_decompose(series, period=24)
-    result.plot()
-    plt.show()
-
-
-def TSAnalysisGetSeasonal(series, seasonal=24, robust=False):
-    result = seasonal_decompose(series, period=24, extrapolate_trend='freq')
-    return result.seasonal
-
-
-def KMeansClustering(X, n_clusters=5):
-    model = KMeans(n_clusters=n_clusters, random_state=0)
-    clusters = model.fit_predict(X)
-    centers = model.cluster_centers_
-    return clusters, centers
-
-
-def OpticsClustering(X, samples=5):
-    model = OPTICS(min_samples=25)  # adjust minimum samples
-    clusters = model.fit_predict(X)
-    return clusters
-
-
 # python3.7 ts_clustering.py water_avg_weekly.csv 100 5
 if __name__ == "__main__":
     if len(sys.argv) < 2:
@@ -62,17 +38,19 @@ if __name__ == "__main__":
         # fn = "data/Water weekly/water_avg_weekly_trends.csv"
         samples = 100
         n_clusters = 4
+        n_bins = 4
     else:
         fn = sys.argv[1]
         samples = int(sys.argv[2])
         n_clusters = int(sys.argv[3])
+        n_bins = int(sys.argv[4])
 
     df = pd.read_csv(fn, sep=',', header=None)
     X = df.iloc[:, [1, 2]]
     # X_Kmeans = df.iloc[:, 3:]
 
     #  First cluster by geo-coordinates
-    clusters = OpticsClustering(X, samples=samples)
+    clusters = clustering_gen.OpticsClustering(X, samples=samples)
     values = np.unique(clusters)
     print("No. geo-coordinates clusters", len(values))
 
@@ -82,6 +60,7 @@ if __name__ == "__main__":
     plot_hist = True
     plot_average_stdev = False
     split_stdev_by_zone = True
+    plot_nclusters = False
 
     X_ts = {}
     X_coords = {}
@@ -90,7 +69,7 @@ if __name__ == "__main__":
     scale_coords = 100000
 
     X_coords_clusters = {}
-
+    n_clusters_zones = {}
     stdev_clusters = {}
     stdev_clusters_avg = {}
     stdev_coords = {}
@@ -115,7 +94,12 @@ if __name__ == "__main__":
 
     # cluster by each geo-coodinates cluster
     for i, elem in enumerate(X_ts):
-        clusters, centers = KMeansClustering(X_ts[elem], n_clusters=n_clusters)
+        # optimal number of clusters
+        n_clusters = clustering_gen.getOptimalClusters(X_ts[elem], 10)
+        # n_clusters = clustering_gen.getOptimalClustersWCSS(X_ts[elem], 10, "zone " + str(i+1))
+        # print(n_clusters)
+        n_clusters_zones[elem] = n_clusters
+        clusters, centers = clustering_gen.KMeansClustering(X_ts[elem], n_clusters=n_clusters)
         # print(clusters)
         X_coords_clusters[elem] = {}
         X_containers[elem].insert(0, "clusters", clusters)
@@ -148,7 +132,7 @@ if __name__ == "__main__":
         # Analyze the TS for each center
         for idx in range(0, n_clusters):
             # TSAnalysis(centers[idx])
-            result = TSAnalysisGetSeasonal(centers[idx])
+            result = clustering_gen.TSAnalysisGetSeasonal(centers[idx])
             stdev = statistics.stdev(result)
             # print(stdev)
             stdev_clusters_1.append(stdev)
@@ -184,6 +168,18 @@ if __name__ == "__main__":
 
     print(X_containers)
 
+    print(n_clusters_zones)
+    n_clusters_zones_list = []
+    n_clusters_zones_labels = []
+    for i, z in enumerate(n_clusters_zones):
+        n_clusters_zones_labels.append(str(i+1))
+        n_clusters_zones_list.append(n_clusters_zones[z])
+
+    if plot_nclusters:
+        fig = graph.plot_barchart(n_clusters_zones_labels, n_clusters_zones_list, "Zone", "Clusters", "Optimal number of clusters", None, [0, 6], None)
+        graph.save_figure(fig, "./figs/optimal_cluster_zones.png")
+ 
+
     stdev_min = []
     stdev_max = []
 
@@ -194,7 +190,9 @@ if __name__ == "__main__":
         sdc = stdev_clusters[sd]
         stdev_min_zone = np.min(sdc)
         stdev_max_zone = np.max(sdc)
-        levels_zones[sd] = utils.get_levels(stdev_min_zone, stdev_max_zone, n_clusters + 1)
+        levels_zones[sd] = utils.get_levels(stdev_min_zone, stdev_max_zone, n_bins + 1)
+        print(stdev_min_zone, stdev_max_zone)
+        print(levels_zones)
         stdev_min.append(stdev_min_zone)
         stdev_max.append(stdev_max_zone)
 
@@ -202,8 +200,7 @@ if __name__ == "__main__":
     stdev_max = np.max(stdev_max)
 
     # compute levels for stdev reclustering
-    levels = utils.get_levels(stdev_min, stdev_max, n_clusters + 1)
-    print(levels)
+    levels = utils.get_levels(stdev_min, stdev_max, n_bins + 1)
 
     # recluster by stdev level global
     stdev_coords_by_stdev, new_assignments = utils.assign_levels(
@@ -220,7 +217,7 @@ if __name__ == "__main__":
 
     print(d_vect)
     print(d_vect_zone)
-    # quit()
+
 
     colors_map = graph.create_discrete_cmap(levels)
     colors_plot = [colors_map(i+1) for i in range(len(levels))]

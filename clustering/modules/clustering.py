@@ -4,21 +4,26 @@ from sklearn.cluster import KMeans, Birch
 from sklearn.metrics import silhouette_samples, silhouette_score
 from sklearn.neighbors import LocalOutlierFactor
 from sklearn.metrics import mean_squared_error
+from scipy.spatial.distance import cdist
 import matplotlib.cm as cm
+import math
 from modules import graph
 
+
 def plot_data(X):
-    ### Let's see the points generated more visual. Plot the points using matplotlib
+    # Let's see the points generated more visual. Plot the points using matplotlib
     plt.scatter(X[:, 0], X[:, 1])
     plt.show()
 
 
 def plot_data_with_clusters(X, kmeans, show_centers=False, xlabel=None, ylabel=None, show=True):
-    ### Let's see the clusters more visual. Let's plot the graphic for our points and draw each point to the cluster it is assigned to
-    plt.scatter(X[:, 0], X[:, 1], c=kmeans.labels_, cmap='rainbow', label="points")
+    # Let's see the clusters more visual. Let's plot the graphic for our points and draw each point to the cluster it is assigned to
+    plt.scatter(X[:, 0], X[:, 1], c=kmeans.labels_,
+                cmap='rainbow', label="points")
 
     if show_centers:
-        plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[:, 1], color="orange", s=(200, 200), label="centroids", marker="o")
+        plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[
+                    :, 1], color="orange", s=(200, 200), label="centroids", marker="o")
 
     plt.title('K-Means Clustering')
     if xlabel:
@@ -49,7 +54,8 @@ def euclid_dist(t1, t2):
 
 
 def k_mean_distance_2d(data, cx, cy, i_centroid, cluster_labels):
-    distances = [np.sqrt((x - cx) ** 2 + (y - cy) ** 2) for (x, y) in data[cluster_labels == i_centroid]]
+    distances = [np.sqrt((x - cx) ** 2 + (y - cy) ** 2)
+                 for (x, y) in data[cluster_labels == i_centroid]]
     return distances
 
 
@@ -60,17 +66,32 @@ def k_mean_distance_gen(data, center_point, i_centroid, cluster_labels):
     distances = []
     avg_dist = 0
     sum_dist = 0
+    use_dict = False
+    # for data_point in data_from_cluster:
+    #     try:
+    #         enumerate(data_point)
+    #     except:
+    #         use_dict = True
+    #         break
+
     # calculate the distance of each point to the assigned cluster
     for data_point in data_from_cluster:
         dist = 0
+
+        if use_dict:
+            dp = data_from_cluster[data_point]
+        else:
+            dp = data_point
+
         # calculate the distance on all dimensions (e.g. 2D, 3D, ...)
-        for i, p in enumerate(data_point):
+        for i, p in enumerate(dp):
             dist += (p - center_point[i]) ** 2
         # dist = np.sqrt(dist)
         distances.append(dist)
         sum_dist += dist
     avg_dist = np.sqrt(sum_dist) / len(data_from_cluster)
     return distances, avg_dist, sum_dist
+
 
 def k_mean_dev_mean_distance_gen(data, i_centroid, cluster_labels):
     # maybe more easy to read
@@ -94,6 +115,7 @@ def k_mean_dev_mean_distance_gen(data, i_centroid, cluster_labels):
     # avg_dist = np.sqrt(sum_dist) / len(data_from_cluster)
     avg_dist = np.sqrt(sum_dist) / len(data_from_cluster)
     return distances, avg_dist, sum_dist
+
 
 def plot_silhouette_score(clusterer, X, cluster_labels, n_clusters):
 
@@ -179,9 +201,11 @@ def plot_silhouette_score(clusterer, X, cluster_labels, n_clusters):
 
     # plt.suptitle(("Silhouette analysis"),
     #              fontsize=14, fontweight='bold')
-    graph.set_disp("Silhouette analysis", "The silhouette coefficient values", "Cluster label")
+    graph.set_disp("Silhouette analysis",
+                   "The silhouette coefficient values", "Cluster label")
     plt.show()
     graph.save_figure(fig, "./figs/silhouette.png")
+
 
 def clustering_birch(X, k, same_order):
     # kmeans = KMeans(n_clusters=k, init="random")
@@ -195,7 +219,7 @@ def clustering_birch(X, k, same_order):
     print("cluster labels: ")
     print(clusters)
 
-    ### Let's print the cluster centers
+    # Let's print the cluster centers
     print("cluster centers")
     print(centroids)
 
@@ -211,8 +235,10 @@ def clustering_birch(X, k, same_order):
     # get the distance between points that are assigned to each cluster
     for i, point in enumerate(centroids):
         # get the distance for each point
-        distance, average_euclid_dist_1, sum_euclid_dist_1 = k_mean_distance_gen(X_input, point, i, clusters)
-        dist_mean, average_euclid_dist_mean_1, sum_euclid_dist_mean_1 = k_mean_dev_mean_distance_gen(X_input, i, clusters)
+        distance, average_euclid_dist_1, sum_euclid_dist_1 = k_mean_distance_gen(
+            X_input, point, i, clusters)
+        dist_mean, average_euclid_dist_mean_1, sum_euclid_dist_mean_1 = k_mean_dev_mean_distance_gen(
+            X_input, i, clusters)
         # get the average distance
         average_euclid_dist += average_euclid_dist_1
         sum_euclid_dist += sum_euclid_dist_1
@@ -231,8 +257,6 @@ def clustering_birch(X, k, same_order):
 
     return X, model, centroids, average_silhouette_score, wcss, average_euclid_dist_mean
 
-    
-
 
 def clustering_kmeans(X, k, same_order):
     # kmeans = KMeans(n_clusters=k, init="random")
@@ -241,24 +265,26 @@ def clustering_kmeans(X, k, same_order):
     if same_order:
         kmeans = KMeans(n_clusters=k, init="k-means++", random_state=0)
     else:
-        kmeans = KMeans(n_clusters=k, init="k-means++")  
+        kmeans = KMeans(n_clusters=k, init="k-means++")
 
     kmeans.fit(X_input)
     clusters = kmeans.predict(X_input)
 
     print("cluster labels: ")
     print(clusters)
+    print("len: ", len(clusters))
 
-    ### Let's print the cluster centers
+    # Let's print the cluster centers
     print("cluster centers")
     centroids = kmeans.cluster_centers_
     print(centroids)
+    print("len: ", len(centroids))
 
-    ### Let's print the labels for our points. In this context, label is the cluster on which the data point is assigned to after the clusterring process
+    # Let's print the labels for our points. In this context, label is the cluster on which the data point is assigned to after the clusterring process
     print("cluster labels")
     print(kmeans.labels_)
 
-    plot_silhouette_score(kmeans, X_input, clusters, k)
+    # plot_silhouette_score(kmeans, X_input, clusters, k)
 
     average_silhouette_score = silhouette_score(X_input, clusters)
     # print("For n_clusters =", k,
@@ -272,8 +298,10 @@ def clustering_kmeans(X, k, same_order):
     # get the distance between points that are assigned to each cluster
     for i, point in enumerate(centroids):
         # get the distance for each point
-        distance, average_euclid_dist_1, sum_euclid_dist_1 = k_mean_distance_gen(X_input, point, i, clusters)
-        dist_mean, average_euclid_dist_mean_1, sum_euclid_dist_mean_1 = k_mean_dev_mean_distance_gen(X_input, i, clusters)
+        distance, average_euclid_dist_1, sum_euclid_dist_1 = k_mean_distance_gen(
+            X_input, point, i, clusters)
+        dist_mean, average_euclid_dist_mean_1, sum_euclid_dist_mean_1 = k_mean_dev_mean_distance_gen(
+            X_input, i, clusters)
         # get the average distance
         average_euclid_dist += average_euclid_dist_1
         sum_euclid_dist += sum_euclid_dist_1
@@ -292,3 +320,6 @@ def clustering_kmeans(X, k, same_order):
     # sum_euclid_dist = 0
 
     return X, kmeans, centroids, average_silhouette_score, wcss, average_euclid_dist_mean
+
+
+
