@@ -1,0 +1,10 @@
+filenames: ["austin-residential-water-consumption-csv_csv"]
+root_data_folder: "data"
+root_model_folder: "models"
+root_model_container: "models/m1"
+load_from_container: True
+one_hot_encoding: False
+train_percent: 80
+activation_fn: "softmax"
+loss_fn: "categorical_crossentropy"
+run_clean: True

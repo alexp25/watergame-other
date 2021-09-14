@@ -1,0 +1,6 @@
+tensorflow==1.5
+keras==2.1.5
+scikit-learn
+matplotlib
+colour
+pandas
