@@ -22,7 +22,7 @@ root_model_folder = config["root_model_folder"]
 filenames = config["filenames"]
 filename = filenames[0]
 
-n_reps = 10
+n_reps = 5
 use_saved_model = False
 
 append_timestamp = False
@@ -92,6 +92,7 @@ for rep in range(n_reps):
     if not use_saved_model:
         tstart = time.time()
         model = classifiers.create_decision_tree()
+        # model = classifiers.create_random_forest()
         # model = classifiers.create_svm()
         # model = classifiers.create_svm_multiclass()
         # model = classifiers.create_naive_bayes()

@@ -1,16 +1,21 @@
 # first neural network with keras tutorial
 # from numpy import genfromtxt
 import numpy as np
-from keras.models import Sequential, load_model
-from keras.layers import Dense, SimpleRNN, LSTM, Dropout
+# from keras.models import Sequential, load_model
+# from tensorflow.keras.models import Sequential, load_model
+
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras.models import Sequential, load_model
+from tensorflow.keras.layers import Dense, SimpleRNN, LSTM, Dropout
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.optimizers import SGD
+
 from sklearn.neural_network import MLPRegressor
-from keras.callbacks import EarlyStopping
-from keras.optimizers import SGD
 
 epochs = 500
 epochs_RNN = 5
 batch_size = 10
-
 
 def reshape_RNN(X):
     print("reshape RNN")

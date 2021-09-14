@@ -14,6 +14,10 @@ import yaml
 from modules.preprocessing import Preprocessing
 from modules import generator
 
+# import tensorflow.compat.v1 as tf
+# tf.disable_v2_behavior()
+
+
 with open("config.yml", "r") as f:
     config = yaml.load(f)
 
@@ -35,7 +39,7 @@ if n_reps > 1:
 else:
     save_best_model = False
 
-use_rnn = True
+use_rnn = False
 
 prep = Preprocessing()
 
@@ -82,7 +86,7 @@ for i in range(n_reps):
 
     # create tensorflow graph session
     graph = tf.Graph()
-    with tf.Session(graph=graph):
+    with tf.compat.v1.Session(graph=graph):
         if use_rnn:
             tstart = time.time()
             model = deep_learning.create_model_RNN(x_train, y_train, config["activation_fn"], config["loss_fn"])

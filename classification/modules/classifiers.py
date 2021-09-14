@@ -55,6 +55,10 @@ def create_decision_tree():
     model = DecisionTreeClassifier()
     return model
 
+def create_random_forest():
+    model = RandomForestClassifier()
+    return model
+
 def create_multi_output_classifier(use_randomforest):
     if use_randomforest:
         # model = MultiOutputClassifier(RandomForestClassifier())
