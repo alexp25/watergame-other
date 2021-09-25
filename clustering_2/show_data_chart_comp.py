@@ -4,6 +4,7 @@
 from modules import loader, graph
 from modules import clustering
 from modules import utils
+from modules import clustering_eval
 
 from matplotlib import pyplot as plt
 
@@ -143,13 +144,20 @@ for option in options:
         classes_ident = run_clustering(x, nc, xheader, xlabels)
         classes["Cluster"] = classes_ident + 1
 
-        classes.to_csv('out.csv', index=False) 
+        classes.to_csv('out.csv', index=False)
 
         print(classes)
-        xc = np.array([classes["Consumer"].to_list(), classes["Cluster"].to_list()])
+        xc = np.array([classes["Consumer"].to_list(),
+                       classes["Cluster"].to_list()])
         xc = np.transpose(xc)
 
         print(xc)
+        clustering_eval.eval_rand_index(
+            classes["Consumer"].to_list(), classes["Cluster"].to_list())
+        clustering_eval.eval_purity(
+            classes["Consumer"].to_list(), classes["Cluster"].to_list())
+        quit()
+
         # quit()
         xheader = ["Consumer Type", "Cluster"]
         xlabels = np.array([classes["ID"], classes["ID"]])
