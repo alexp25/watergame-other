@@ -11,6 +11,7 @@ from shutil import copyfile, copy2
 import yaml
 import json
 from modules.preprocessing import Preprocessing
+from modules import preprocessing
 from modules import generator
 from typing import List
 
@@ -21,6 +22,9 @@ root_data_folder = config["root_data_folder"]
 root_model_folder = config["root_model_folder"]
 filenames = config["filenames"]
 filename = filenames[0]
+
+method = "dtree"
+method = "randomforest"
 
 n_reps = 5
 use_saved_model = False
@@ -43,6 +47,8 @@ if config["run_clean"] and not use_saved_model:
 
 data_file = root_data_folder + "/" + filenames[0] + ".csv"
 X, y, features, classes = loader.load_dataset(data_file, True)
+
+X = preprocessing.normalize(X)
 
 acc_train_vect = {
     "data": [],
@@ -91,8 +97,12 @@ for rep in range(n_reps):
 
     if not use_saved_model:
         tstart = time.time()
-        model = classifiers.create_decision_tree()
-        # model = classifiers.create_random_forest()
+
+        if method == "dtree":
+            model = classifiers.create_decision_tree()
+        elif method == "randomforest":
+            model = classifiers.create_random_forest()
+
         # model = classifiers.create_svm()
         # model = classifiers.create_svm_multiclass()
         # model = classifiers.create_naive_bayes()
@@ -138,6 +148,7 @@ print(json.dumps(acc_train_vect))
 print("\ntest vect")
 print(json.dumps(acc_test_vect))
 
+
 def create_barseries(accs, keys):
     tss: List[Barseries] = []
     colors = ['blue', 'red', 'green', 'orange']
@@ -158,30 +169,34 @@ def create_barseries(accs, keys):
         ts = None
     return tss
 
+
 def extract_csv(vect):
     csvoutput = ""
-    csvoutput = str(vect["avg"]) + "," + str(vect["top"]) + "," + str(vect["best_model"]) + "\n"
+    csvoutput = str(vect["avg"]) + "," + str(vect["top"]) + \
+        "," + str(vect["best_model"]) + "\n"
     return csvoutput
+
 
 csvoutput = extract_csv(acc_train_vect)
 
-with open("./output/eval_dtree_1_train.csv", "w") as f:
+with open("./output/eval_" + method + "_train.csv", "w") as f:
     f.write(csvoutput)
 
 csvoutput = extract_csv(acc_test_vect)
 
-with open("./output/eval_dtree_1_test.csv", "w") as f:
+with open("./output/eval_" + method + "_test.csv", "w") as f:
     f.write(csvoutput)
 
 print(acc_train_vect)
 print(acc_test_vect["avg"])
 
 # quit()
-tss = create_barseries([acc_test_vect["avg"], acc_test_vect["top"]], ["avg", "best"])
+tss = create_barseries(
+    [acc_test_vect["avg"], acc_test_vect["top"]], ["avg", "best"])
 print(tss)
 # quit()
 
 fig = graph.plot_barchart_multi(
     tss, "model", "accuracy", "Average accuracy", ["Decision Tree"], [70, 100])
 
-graph.save_figure(fig, "./figs/mean_accuracy_dtree_1")
+graph.save_figure(fig, "./figs/mean_accuracy_" + method)

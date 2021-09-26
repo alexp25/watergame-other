@@ -1,6 +1,6 @@
 from sklearn import tree
 import pydot
-from sklearn.externals.six import StringIO
+from six import StringIO
 import matplotlib.pyplot as plt
 import pandas as pd
 

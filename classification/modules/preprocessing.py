@@ -1,6 +1,7 @@
 
 import numpy as np
 from sklearn.preprocessing import OneHotEncoder, OrdinalEncoder
+from sklearn.preprocessing import MinMaxScaler, StandardScaler
 import math
 
 
@@ -133,6 +134,7 @@ def get_samples_nbins(a, bins):
     b = get_samples_skip(a, skip)
     return b[:bins]
 
+
 def get_samples_skip(a, skip):
     b = []
     for i, e in enumerate(a):
@@ -140,3 +142,11 @@ def get_samples_skip(a, skip):
             b.append(e)
     return b
 
+
+def normalize(data):
+    # data = [[-1, 2], [-0.5, 6], [0, 10], [1, 18]]
+    scaler = MinMaxScaler()
+    # scaler = StandardScaler()
+    scaler.fit(data)
+    scaled = scaler.transform(data)
+    return scaled

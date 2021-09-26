@@ -13,6 +13,7 @@ from shutil import copyfile, copy2
 import yaml
 from modules.preprocessing import Preprocessing
 from modules import generator
+from modules import preprocessing
 
 # import tensorflow.compat.v1 as tf
 # tf.disable_v2_behavior()
@@ -45,6 +46,8 @@ prep = Preprocessing()
 
 data_file = root_data_folder + "/" + filename + ".csv"
 X, y, features, classes = loader.load_dataset(data_file, True)
+
+X = preprocessing.normalize(X)
 
 print(y)
 
