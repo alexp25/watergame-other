@@ -7,4 +7,4 @@ one_hot_encoding: False
 train_percent: 50
 activation_fn: "softmax"
 loss_fn: "categorical_crossentropy"
-run_clean: True
+run_clean: False
