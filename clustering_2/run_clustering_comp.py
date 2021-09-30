@@ -4,7 +4,7 @@
 from modules import loader, graph
 from modules import clustering
 from modules import utils
-from modules import clustering_eval
+from modules import clustering_eval, clustering_eval_2
 from modules import preprocessing
 from matplotlib import pyplot as plt
 import numpy as np
@@ -43,11 +43,8 @@ plot_all_data = False
 remove_outlier = True
 remove_outlier = False
 
-norm = True
-# norm = False
-
 norm2 = True
-norm2 = False
+# norm2 = False
 
 for option in options:
 
@@ -58,15 +55,6 @@ for option in options:
     start_col = 3
     end_col = 61
     fill_start = False
-
-    norm_sum = option["norm_sum"]
-    norm_axis = option["norm_axis"]
-    norm = True
-
-    if not norm_sum and not norm_axis:
-        norm = False
-
-    # print(norm_sum, norm)
 
     nc = option["nc"]
 
@@ -83,7 +71,7 @@ for option in options:
         classes = df[["ID", "Consumer"]]
         # print(classes)
         nheader = len(header)
-
+        x = preprocessing.imputation(x)
         sx = np.shape(x)
 
         if fill_start:
@@ -106,12 +94,6 @@ for option in options:
 
             x = clustering.remove_outliers(x)
 
-        if norm:
-            if norm_sum:
-                x = utils.normalize_sum_axis(x, 0)
-            if norm_axis:
-                x = utils.normalize_axis_01(x, 1)
-
         if norm2:
             x = preprocessing.normalize(x)
 
@@ -129,12 +111,6 @@ for option in options:
         xlabels = np.transpose(xlabels)
         print(xlabels)
 
-        if plot_all_data:
-            title = filename
-            xplot = np.transpose(x)
-            tss = utils.create_timeseries(xplot, None, None)
-            fig = graph.plot_timeseries_multi_sub2(
-                [tss], [title], "x", ["y"], None, None, 24)
 
         # cluster labels
         xheader = ["c" + str(i+1) for i in range(sx[1])]
@@ -156,10 +132,17 @@ for option in options:
         xc = np.transpose(xc)
 
         print(xc)
-        clustering_eval.eval_rand_index(
-            classes["Consumer"].to_list(), classes["Cluster"].to_list())
-        clustering_eval.eval_purity(
-            classes["Consumer"].to_list(), classes["Cluster"].to_list())
+        eval_data =  [classes["Consumer"].to_list(), classes["Cluster"].to_list()]
+        clustering_eval.eval_rand_index(eval_data[0], eval_data[1])
+        clustering_eval.eval_purity(eval_data[0], eval_data[1])
+        p = clustering_eval_2.purity(eval_data[0], eval_data[1])
+        print("purity: ", p)
+        p = clustering_eval_2.entropy(eval_data[0], eval_data[1])
+        print("entropy: ", p)
+        p = clustering_eval_2.rand_index(eval_data[0], eval_data[1])
+        print("rand index: ", p)
+        p = clustering_eval_2.adj_rand_index(eval_data[0], eval_data[1])
+        print("adj rand index: ", p)
         quit()
 
         # quit()

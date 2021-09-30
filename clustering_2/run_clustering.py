@@ -4,7 +4,7 @@
 from modules import loader, graph
 from modules import clustering
 from modules import utils
-
+from modules import preprocessing
 from matplotlib import pyplot as plt
 
 
@@ -79,8 +79,8 @@ plot_all_data = False
 remove_outlier = True
 remove_outlier = False
 
-norm = True
-# norm = False
+norm2 = True
+# norm2 = False
 
 for option in options:
 
@@ -91,16 +91,7 @@ for option in options:
     start_col = 3
     end_col = 61
     fill_start = False
-
-    norm_sum = option["norm_sum"]
-    norm_axis = option["norm_axis"]
-    norm = True
-
-    if not norm_sum and not norm_axis:
-        norm = False
         
-    # print(norm_sum, norm)
-
     nc = option["nc"]
 
     if nc is None:
@@ -116,6 +107,11 @@ for option in options:
         x, header = loader.load_dataset(data_file)
         # x = np.nan_to_num(x)
         nheader = len(header)
+
+        x = preprocessing.imputation(x)
+
+        if norm2:
+            x = preprocessing.normalize(x)
 
         sx = np.shape(x)
 
@@ -146,14 +142,6 @@ for option in options:
             # print(outliers)
 
             # x = np.delete(x, obj=outliers, axis=0)
-
-        # quit()
-
-        if norm:
-            if norm_sum:
-                x = utils.normalize_sum_axis(x, 0)
-            if norm_axis:
-                x = utils.normalize_axis_01(x, 1)
 
         # print(x)
 
@@ -192,29 +180,26 @@ for option in options:
         else:
             xlabels = [xlabels] * nc
 
+        # print(np.shape(xlabels))
+
+        # quit()
+
         tss, nc = run_clustering(x, nc, xheader, xlabels)
 
         # plot cluster centroids
         title = filename
 
-        title = "monthly consumer patterns (" + str(nc) + "c)"
+        title = "consumer patterns (" + str(nc) + "c)"
 
         ylabel = "y [L]"
-        if norm:
+        if norm2:
             ylabel = "y [norm]"
 
         fig = graph.plot_timeseries_multi_sub2(
             [tss], [title], "x [months]", [ylabel], None, 5, None)
 
         result_name = "./figs/consumer_patterns_" + str(nc_orig) + "c"
-        if norm:
+        if norm2:
             result_name += "_norm"
-            if norm_sum:
-                result_name += "_norm_sum"
-            if norm_axis:
-                result_name += "_norm_axis"
             
-        # graph.save_figure(fig, result_name)
-
-        # run_clustering(y, times, yheader)
-        # plot_data(x, y, xheader, yheader)
+        graph.save_figure(fig, result_name)

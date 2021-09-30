@@ -24,7 +24,7 @@ filenames = config["filenames"]
 filename = filenames[0]
 
 method = "dtree"
-method = "randomforest"
+# method = "randomforest"
 
 n_reps = 5
 use_saved_model = False
@@ -48,6 +48,7 @@ if config["run_clean"] and not use_saved_model:
 data_file = root_data_folder + "/" + filenames[0] + ".csv"
 X, y, features, classes = loader.load_dataset(data_file, True)
 
+X = preprocessing.imputation(X)
 X = preprocessing.normalize(X)
 
 acc_train_vect = {

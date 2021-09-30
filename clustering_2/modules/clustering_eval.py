@@ -4,11 +4,11 @@ import numpy as np
 
 def eval_rand_index(labels_true, labels_pred):
     rs1 = rand_score(labels_true, labels_pred)
-    print(rs1)
+    print("rand index: ", rs1)
     rs2 = adjusted_rand_score(labels_true, labels_pred)
-    print(rs2)
-    rs3 = adjusted_mutual_info_score(labels_true, labels_pred)
-    print(rs3)
+    print("adjusted rand index: ", rs2)
+    # rs3 = adjusted_mutual_info_score(labels_true, labels_pred)
+    # print(rs3)
 
 # considering same number of labels for true and pred
 def eval_purity(labels_true, labels_pred):
@@ -53,4 +53,7 @@ def eval_purity(labels_true, labels_pred):
         sum_max += max_i
 
     p = sum_max / total_sum
-    print(p)
+    print("purity: ", p)
+
+
+    

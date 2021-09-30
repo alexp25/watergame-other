@@ -4,7 +4,7 @@
 from modules import loader, graph
 from modules import clustering
 from modules import utils
-
+from modules import preprocessing
 from matplotlib import pyplot as plt
 
 
@@ -22,11 +22,13 @@ root_data_folder = "./data"
 # read the data from the csv file
 
 filenames = ["data_consumer_types.csv"]
+filenames_aux = ["data_consumer_types_content.csv"]
+
 
 def run_clustering(x, nc, xheader, xlabels=None):
-    
+
     xc = np.transpose(centroids)
-    # xc = np.transpose(xc)   
+    # xc = np.transpose(xc)
 
     if xlabels is not None:
         xlabels = np.array(xlabels)
@@ -39,7 +41,7 @@ def run_clustering(x, nc, xheader, xlabels=None):
 
 
 options = [
-    
+
     {
         "nc": 4,
         "norm_sum": False,
@@ -50,8 +52,8 @@ options = [
 plot_all_data = True
 plot_all_data = False
 
-norm = True
-# norm = False
+norm2 = True
+# norm2 = False
 
 for option in options:
 
@@ -63,13 +65,6 @@ for option in options:
     end_col = 61
     fill_start = False
 
-    norm_sum = option["norm_sum"]
-    norm_axis = option["norm_axis"]
-    norm = True
-
-    if not norm_sum and not norm_axis:
-        norm = False
-        
     # print(norm_sum, norm)
 
     nc = option["nc"]
@@ -82,26 +77,60 @@ for option in options:
     # continue
 
     # create separate models for each data file
-    for filename in filenames:
+    for i, filename in enumerate(filenames):
         data_file = root_data_folder + "/" + filename
+        data_file_aux = root_data_folder + "/" + filenames_aux[i]
         x, header = loader.load_dataset(data_file)
+        x2, _ = loader.load_dataset(data_file_aux)
+        x2 = preprocessing.imputation(x2)
+
+        if norm2:
+            x2 = preprocessing.normalize(x)
+
         df = loader.load_dataset_pd(data_file)
+
+        print("\n\n\n")
+
         classes = df
-        groups = classes.groupby(["Consumer"]).cumcount()
-        x_groups_list = (df.set_index(['Consumer',groups])
-            .unstack(fill_value=0)
-            .stack().groupby(level=0)
-            .apply(lambda x: x.values.tolist())
-            .tolist())
-        x_groups = np.array(x_groups_list)
-        
-        print(x_groups_list[0][1])
 
-        quit()
-        # x = np.nan_to_num(x)
-        nheader = len(header)
+        groups = classes.groupby(["Consumer"]).groups
+        groups_dict = {}
 
-        sx = np.shape(x)
+        for group in groups:
+            idx = list(groups[group])
+            key = str(group)
+            groups_dict[key] = {
+                "group": key,
+                "idx": idx,
+                "dataset": [],
+                "mean": None
+            }
+            dataset = []
+            for i in idx:
+                dataset.append(x2[i])
+            groups_dict[key]["dataset"] = np.array(dataset)
+            groups_dict[key]["mean"] = np.average(dataset, axis=0)
+            # groups_dict[key]["mean"] = np.array(dataset[12])
+
+        x_groups = []
+        for k in groups_dict:
+            gd = groups_dict[k]
+            print(len(gd["idx"]))
+            print(np.shape(gd["mean"]))
+            x_groups.append(gd["mean"])
+
+        x_groups = np.array(x_groups)
+        print(np.shape(x_groups))
+        print(x_groups)
+
+        # x = x_groups[2:,:]
+        x = x_groups
+
+        start_index = 0
+        end_index = None
+        start_col = 3
+        end_col = 61
+        fill_start = False
 
         if fill_start:
             x = x[start_index:, :]
@@ -114,19 +143,9 @@ for option in options:
         if end_col is not None:
             x = x[:, :end_col]
 
+        nheader = len(header)
         sx = np.shape(x)
         print(sx)
-
-
-        if norm:
-            if norm_sum:
-                x = utils.normalize_sum_axis(x, 0)
-            if norm_axis:
-                x = utils.normalize_axis_01(x, 1)
-
-        sx = np.shape(x)
-        print(sx)
-
         print("start")
 
         # quit()
@@ -134,53 +153,42 @@ for option in options:
         header = []
         for d in range(nheader-1):
             header.append(str(d+1))
+        # header = ["multi-family", "multi-family - irrigation", "residential", "residential - irrigation"]
 
         # time axis labels
-        xlabels = [str(i) for i in range(sx[1])]
+        xlabels = [str(i) for i in range(sx[1]+1)]
+        
         xlabels = np.array(xlabels)
         xlabels = np.transpose(xlabels)
-        print(xlabels)
-
-        if plot_all_data:
-            title = filename
-            xplot = np.transpose(x)
-            tss = utils.create_timeseries(xplot, None, None)
-            fig = graph.plot_timeseries_multi_sub2(
-                [tss], [title], "x", ["y"], None, None, 24)
-
-    
-        # cluster labels
-        xheader = ["c" + str(i+1) for i in range(sx[1])]
-        print(xheader)
 
         if nc is None:
             xlabels = [xlabels] * 1000
         else:
             xlabels = [xlabels] * nc
 
-        tss, nc = run_clustering(x, nc, xheader, xlabels)
-
-        # plot cluster centroids
-        title = filename
-
-        title = "monthly consumer patterns (" + str(nc) + "c)"
-
+        title = "consumer patterns / type (" + str(nc) + "c)"
         ylabel = "y [L]"
-        if norm:
+        if norm2:
             ylabel = "y [norm]"
+            
+        xplot = np.transpose(x)
+        if xlabels is not None:
+            xlabels = np.array(xlabels)
+            xlabels = np.transpose(xlabels)
+
+        print(xlabels)
+        print(np.shape(xplot))
+
+        # quit()
+        # quit()
+
+        tss = utils.create_timeseries(xplot, header, xlabels)
 
         fig = graph.plot_timeseries_multi_sub2(
             [tss], [title], "x [months]", [ylabel], None, 5, None)
 
-        result_name = "./figs/consumer_patterns_" + str(nc_orig) + "c"
-        if norm:
+        result_name = "./figs/consumer_types_" + str(nc_orig) + "c"
+        if norm2:
             result_name += "_norm"
-            if norm_sum:
-                result_name += "_norm_sum"
-            if norm_axis:
-                result_name += "_norm_axis"
-            
-        # graph.save_figure(fig, result_name)
+        graph.save_figure(fig, result_name)
 
-        # run_clustering(y, times, yheader)
-        # plot_data(x, y, xheader, yheader)

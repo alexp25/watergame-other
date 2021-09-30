@@ -14,7 +14,7 @@ from tensorflow.keras.optimizers import SGD
 from sklearn.neural_network import MLPRegressor
 
 epochs = 500
-epochs_RNN = 5
+epochs_RNN = 10
 batch_size = 10
 
 def reshape_RNN(X):

@@ -29,7 +29,7 @@ FSIZE_TITLE = 18
 FSIZE_LABEL = 16
 FSIZE_LABEL_S = 16
 FSIZE_LABEL_XS = 14
-OPACITY = 0.9
+OPACITY = 1
 
 # FSIZE_TITLE = 28
 # FSIZE_LABEL = 24
@@ -450,26 +450,36 @@ def set_fontsize():
     matplotlib.rcParams.update({'font.size': 16})
 
 
-def plot_barchart(labels, values, xlabel, ylabel, title, color):
+def plot_barchart(labels, values, xlabel, ylabel, title, color, limits):
 
     fig = plt.figure()
 
     y_pos = np.arange(len(labels))
 
+    ax = plt.gca()
+    ax.grid(zorder=0)
+    ax.set_axisbelow(True)
+
     plt.bar(y_pos, values, align='center', alpha=OPACITY, color=color)
     plt.xticks(y_pos, labels)
 
     plt.xlabel(xlabel)
-    plt.ylabel(ylabel)
+    plt.ylabel(ylabel)    
 
     low = min(values)
     high = max(values)
+    low -= 0.005*low
+    high += 0.005*high
+
+    if limits is not None:
+        low = limits[0]
+        high = limits[1]
 
     print(low)
     print(high)
     # plt.ylim([math.ceil(low-0.5*(high-low)), math.ceil(high+0.5*(high-low))])
     # plt.ylim([math.ceil(low-0.005*(high-low)), math.ceil(high+0.005*(high-low))])
-    plt.ylim([low - 0.005*low, high + 0.005*high])
+    plt.ylim([low, high])
 
     plt.title(title)
 
