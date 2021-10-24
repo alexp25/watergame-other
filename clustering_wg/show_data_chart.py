@@ -21,7 +21,7 @@ import sys
 root_data_folder = "./data"
 # read the data from the csv file
 
-filenames = ["watergame_sample_consumer.csv"]
+filenames = ["watergame_sample_consumer_41364.csv"]
 
 
 def run_clustering(x, nc, xheader, xlabels=None):
@@ -151,6 +151,9 @@ norm = False
 extract_inst_flow = False
 extract_inst_flow = True
 
+rolling_filter = True
+# rolling_filter = False
+
 for option in options:
 
     print(option)
@@ -220,7 +223,12 @@ for option in options:
         sx = np.shape(x)
         print(sx)
 
-        # quit()
+        if rolling_filter:
+            kernel_size = int(0.1 * sx[0])
+            kernel = np.ones(kernel_size) / kernel_size
+            for dim in range(sx[1]):
+                x[:,dim] = np.convolve(x[:,dim], kernel, mode='same')
+
 
         if remove_outlier:
             outlier = -1
@@ -258,7 +266,10 @@ for option in options:
             fig = graph.plot_timeseries_multi_sub2(
                 [tss], [title], "time", [xlabel], None, None, None, xlabels)
 
-        result_name = "./figs/consumer_data_" + xtype + "_" + str(sid[0])
+        result_name = "./figs/consumer_data_" + xtype + "_"
+        if rolling_filter:
+            result_name += "rf_"
+        result_name += str(sid[0])
         graph.save_figure(fig, result_name)
         quit()
 
