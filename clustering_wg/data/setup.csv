@@ -1,0 +1,14 @@
+no.,status check,id,apartament,loc,label,D1,D2,D3,D4,D5,D6,D7,lat,lng,obs
+1,1,97074,DB,bucatarie,,chiuveta_rece,chiuveta_calda,,,,,,44.48634,26.04781,
+2,~1,20041,COS,bucatarie,,chiuveta_rece,chiuveta_calda,,,,,,44.4117898,26.1273017,
+3,~1,62706,COS,baie_1,langa bucatarie,chiuveta_rece,chiuveta_calda,toaleta,,,,,44.4117898,26.1273017,
+4,,41364,COS,baie_2,parter,chiuveta_rece,chiuveta_calda,toaleta,,dus,,,44.4117898,26.1273017,
+5,~1,33383,COS,baie_3,cos,chiuveta_rece,chiuveta_calda,toaleta,,dus,,,44.4117898,26.1273017,
+6,,53081,COS,baie_4,mansarda,chiuveta_rece,chiuveta_calda,toaleta,,,,,44.4117898,26.1273017,
+7,,55891,COS,baie_5,bubu,chiuveta_rece,chiuveta_calda,toaleta,,dus,,,44.4117898,26.1273017,
+8,,,AP,bucatarie,,chiuveta_rece,chiuveta_calda,,,,,,44.455968,26.0884475,TBD
+9,1,57226,AP,baie_1,,,,toaleta,,,masina_spalat,,44.455968,26.0884475,TBD
+10,,16102,AT,bucatarie,,chiuveta_rece,chiuveta_calda,,,,,,44.414563,26.0335787,
+11,,14945,AT,baie_1,,,,,,toaleta,,,44.414563,26.0335787,
+12,1,89776,AD,baie_1,,chiuveta_rece,chiuveta_calda,toaleta,,masina_spalat,masina_spalat_vase,,44.3775129,26.1381178,
+13,1,65506,AD,bucatarie,,chiuveta_rece,chiuveta_calda,,,,,,44.3775129,26.1381178,

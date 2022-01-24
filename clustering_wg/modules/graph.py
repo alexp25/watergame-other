@@ -139,10 +139,9 @@ def plot_xy(x, y, rads, labels, colors, title, xlabel, ylabel, scale, show_legen
     return fig
 
 
-def plot_timeseries_multi_sub2(timeseries_arrays: List[List[Timeseries]], title, xlabel, ylabel, figsize, ndivx, ndiv, xlabels=None):
+def plot_timeseries_multi_sub2(timeseries_arrays: List[List[Timeseries]], title, xlabel, ylabel, figsize, ndivx, ndiv, xlabels=None, show=True, id=0):
     matplotlib.style.use('default')
-    id = 0
-
+  
     if not figsize:
         fig = plt.figure(id, figsize=(16, 8))
         # fig = plt.figure(id)
@@ -188,7 +187,8 @@ def plot_timeseries_multi_sub2(timeseries_arrays: List[List[Timeseries]], title,
     # plt.xticks(yint)
 
     fig = plt.gcf()
-    plt.show()
+    if show:
+        plt.show()
     return fig
 
 

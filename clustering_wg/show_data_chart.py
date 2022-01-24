@@ -1,6 +1,7 @@
 
 
 # import our modules
+from fileinput import filename
 from modules import loader, graph
 from modules import clustering
 from modules import utils
@@ -21,7 +22,30 @@ import sys
 root_data_folder = "./data"
 # read the data from the csv file
 
-filenames = ["watergame_sample_consumer_41364.csv"]
+
+# load sensors list
+data_file = root_data_folder + "/" + "setup.csv"
+df = loader.load_dataset_pd(data_file)
+
+sensor_list = []
+for row in df.iterrows():
+    rowspec = row[1]
+    if not np.isnan(rowspec["id"]):
+        sensor_spec = {
+            "id": int(rowspec["id"]),
+            "labels": []
+        }
+        data_labels = ["D1", "D2", "D3", "D4", "D5", "D6", "D7"]
+        for dl in data_labels:
+            try:
+                if np.isnan(rowspec[dl]):
+                    pass    
+            except:
+                sensor_spec["labels"].append(rowspec[dl])   
+                pass    
+        # print(row)
+        sensor_list.append(sensor_spec)
+        print(sensor_spec)
 
 
 def run_clustering(x, nc, xheader, xlabels=None):
@@ -180,7 +204,8 @@ for option in options:
         nc_orig = nc
 
     # create separate models for each data file
-    for filename in filenames:
+    for sensor_spec in sensor_list:
+        filename = "watergame_sample_consumer_" + str(sensor_spec["id"]) + ".csv"
         data_file = root_data_folder + "/" + filename
         x, header = loader.load_dataset(data_file)
 
@@ -249,7 +274,7 @@ for option in options:
         header = []
         for d in range(nheader-1):
             header.append(str(d+1))
-        header = ["cold tap", "hot tap", "toilet", "shower", "washing machine"]
+        header = sensor_spec["labels"]
 
         # time axis labels
         # xlabels = [str(i) for i in range(sx[1])]
@@ -271,8 +296,7 @@ for option in options:
             result_name += "rf_"
         result_name += str(sid[0])
         graph.save_figure(fig, result_name)
-        quit()
-
+        
         # cluster labels
         xheader = ["c" + str(i+1) for i in range(sx[1])]
         print(xheader)
