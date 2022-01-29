@@ -64,13 +64,13 @@ def run_clustering(x, nc, xheader, xlabels=None):
     return tss, nc
 
 
-nc = 4
+nc = 2
 
 root_data_folder = "./data"
 # read the data from the csv file
 
 rolling_filter = False
-# rolling_filter = True
+rolling_filter = True
 
 result_name = root_data_folder + "/res"
 if rolling_filter:
@@ -91,8 +91,8 @@ end_col = None
 fill_start = False
 
 filter_labels = []
-# filter_labels = ["toaleta", "chiuveta_rece", "chiuveta_calda"]
-filter_labels = ["toaleta"]
+filter_labels = ["toaleta", "chiuveta_rece", "chiuveta_calda"]
+# filter_labels = ["toaleta"]
 
 x, header = loader.load_dataset(result_name)
 

@@ -16,7 +16,12 @@ def plot_data(X):
     plt.show()
 
 
-def plot_data_with_clusters(X, kmeans, show_centers=False, xlabel=None, ylabel=None, show=True):
+def plot_data_with_clusters(X, kmeans, show_centers=False, xlabel=None, ylabel=None, show=True, figsize=None, id=0):
+    if not figsize:
+        fig = plt.figure(id, figsize=(16, 8))
+        # fig = plt.figure(id)
+    else:
+        fig = plt.figure(id, figsize=figsize)
     # Let's see the clusters more visual. Let's plot the graphic for our points and draw each point to the cluster it is assigned to
     plt.scatter(X[:, 0], X[:, 1], c=kmeans.labels_,
                 cmap='rainbow', label="points")
@@ -34,6 +39,7 @@ def plot_data_with_clusters(X, kmeans, show_centers=False, xlabel=None, ylabel=N
     plt.xticks()
     if show:
         plt.show()
+    return fig
 
 
 # https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.LocalOutlierFactor.html
@@ -323,6 +329,8 @@ def clustering_kmeans(X, k, same_order):
     average_euclid_dist_mean = 0
     sum_euclid_dist_mean = 0
 
+    sum_euclid_dist_each = []
+
     # get the distance between points that are assigned to each cluster
     for i, point in enumerate(centroids):
         # get the distance for each point
@@ -333,6 +341,7 @@ def clustering_kmeans(X, k, same_order):
         # get the average distance
         average_euclid_dist += average_euclid_dist_1
         sum_euclid_dist += sum_euclid_dist_1
+        sum_euclid_dist_each.append(sum_euclid_dist_1)
         average_euclid_dist_mean += average_euclid_dist_mean_1
         sum_euclid_dist_mean += sum_euclid_dist_mean_1
 
@@ -347,7 +356,7 @@ def clustering_kmeans(X, k, same_order):
     # average_silhouette_score = 0
     # sum_euclid_dist = 0
 
-    return X, kmeans, centroids, average_silhouette_score, wcss, average_euclid_dist_mean
+    return X, kmeans, centroids, average_silhouette_score, wcss, average_euclid_dist_mean, sum_euclid_dist_each
 
 
 
