@@ -57,10 +57,10 @@ remove_outlier = True
 norm = False
 
 extract_inst_flow = False
-extract_inst_flow = True
+# extract_inst_flow = True
 
 rolling_filter = True
-# rolling_filter = False
+rolling_filter = False
 
 
 start_index = 1

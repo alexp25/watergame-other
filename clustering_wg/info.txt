@@ -2,3 +2,8 @@
 1. extract_combined.py
 2. show_extracted.py
 
+# flow 2 (events)
+1. extract_combined.py
+2. extract_events.py
+3. process_events.py
+
