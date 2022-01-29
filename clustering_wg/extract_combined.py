@@ -30,9 +30,9 @@ for row in df.iterrows():
         for dl in data_labels:
             try:
                 if np.isnan(rowspec[dl]):
-                    pass    
+                    pass
             except:
-                sensor_spec["labels"].append(rowspec[dl])   
+                sensor_spec["labels"].append(rowspec[dl])
                 pass
         for k, label in enumerate(sensor_spec["labels"]):
             sensor_list_exp.append({
@@ -48,19 +48,21 @@ for row in df.iterrows():
 
 
 plot_all_data = True
-plot_all_data = False
+# plot_all_data = False
 
 remove_outlier = True
-# remove_outlier = False
+remove_outlier = False
 
 # norm = True
 norm = False
 
 extract_inst_flow = False
-# extract_inst_flow = True
+extract_inst_flow = True
+
+save_file = False
 
 rolling_filter = True
-# rolling_filter = False
+rolling_filter = False
 
 
 start_index = 1
@@ -87,9 +89,8 @@ for plot_index, sensor_spec in enumerate(sensor_list):
     sid = df["sensorId"]
     # print(list(timestamps))
     # quit()
-    
-    nheader = len(header)
 
+    nheader = len(header)
     sx = np.shape(x)
 
     if fill_start:
@@ -101,7 +102,7 @@ for plot_index, sensor_spec in enumerate(sensor_list):
     if end_index is not None:
         x = x[:end_index, :]
     if end_col is not None:
-        x = x[:,:end_col]
+        x = x[:, :end_col]
 
     xlabel = ""
     xtype = ""
@@ -109,13 +110,16 @@ for plot_index, sensor_spec in enumerate(sensor_list):
     if extract_inst_flow:
         xlabel = "flow [L/h]"
         xtype = "flow"
-        title = "consumption data (flow) node " + str(sid[0]) + " (" + sensor_spec["loc"] + ")"
-        x = x[:,1::2]
+        # title = "consumption data (flow) node " + str(sid[0]) + " (" + sensor_spec["loc"] + ")"
+        # title = "consumption data (flow) node " + str(sid[0])
+        title = "flow data node " + str(sid[0])
+        x = x[:, 1::2]
     else:
         xlabel = "volume [L]"
         xtype = "volume"
-        title = "consumption data (volume) node " + str(sid[0]) + " (" + sensor_spec["loc"] + ")"
-        x = x[:,0::2] / 1000
+        title = "consumption data (volume) node " + \
+            str(sid[0]) + " (" + sensor_spec["loc"] + ")"
+        x = x[:, 0::2] / 1000
 
     sx = np.shape(x)
     print(sx)
@@ -124,7 +128,7 @@ for plot_index, sensor_spec in enumerate(sensor_list):
         kernel_size = int(0.1 * sx[0])
         kernel = np.ones(kernel_size) / kernel_size
         for dim in range(sx[1]):
-            x[:,dim] = np.convolve(x[:,dim], kernel, mode='same')
+            x[:, dim] = np.convolve(x[:, dim], kernel, mode='same')
 
     if remove_outlier:
         outlier = -1
@@ -140,6 +144,15 @@ for plot_index, sensor_spec in enumerate(sensor_list):
     for d in range(nheader-1):
         header.append(str(d+1))
     header = sensor_spec["labels"]
+    mapping = {
+        "dus": "shower",
+        "chiuveta_rece": "sink_cold",
+        "chiuveta_calda": "sink_hot",
+        "toaleta": "toilet",
+        "masina_spalat": "washing_machine",
+        "masina_spalat_vase": "dishwasher"
+    }
+    header = [mapping[head] for head in header]
 
     # time axis labels
     # xlabels = [str(i) for i in range(sx[1])]
@@ -155,54 +168,55 @@ for plot_index, sensor_spec in enumerate(sensor_list):
         for sensor_exp in sensor_list_exp:
             if sensor_exp["id"] == sensor_spec["id"] and sensor_exp["label"] == label:
                 try:
-                    sensor_exp["data"] = x[:,label_index]
-                
+                    sensor_exp["data"] = x[:, label_index]
                     data_row_max_size_1 = len(sensor_exp["data"])
                     if data_row_max_size_1 > data_row_max_size:
                         data_row_max_size = data_row_max_size_1
 
                     sensor_exp["online"] = True
-                except:                    
+                except:
                     print("exc " + str(sensor_exp["id"]))
-                
+
     if plot_all_data:
         xplot = x
         tss = utils.create_timeseries(xplot, header, None)
+        xlabels = None
         fig = graph.plot_timeseries_multi_sub2(
-            [tss], [title], "time", [xlabel], None, None, None, xlabels, False, plot_index)
+            [tss], [title], "sample", [xlabel], (8, 6), None, None, xlabels, False, plot_index)
+        result_name = "./figs/consumer_data_" + xtype + "_"
+        if rolling_filter:
+            result_name += "rf_"
+        result_name += str(sid[0])
+        graph.save_figure(fig, result_name, 200)
 
-    result_name = "./figs/consumer_data_" + xtype + "_"
-    if rolling_filter:
-        result_name += "rf_"
-    result_name += str(sid[0])
-    # graph.save_figure(fig, result_name)
     # quit()
 
 print(data_row_max_size)
 # quit()
 
-# print(sensor_list_exp)
-# exp_data = "uid,lat,lng,"
-exp_data = "uid,label,x"
-for d in range(data_row_max_size):
-    exp_data += "," + str(d)
-exp_data += "\n"
-for sexp in sensor_list_exp:
-    if sexp["online"]:
-        exp_data_row = sexp["uid"] + "," + sexp["label"] + ",x"
-        len_data = len(sexp["data"])
-        for d in sexp["data"]:
-            exp_data_row += "," + str(d)
-        len_data_rem = data_row_max_size - len_data
-        for d in range(len_data_rem):
-            exp_data_row += ",0"
-        exp_data_row += "\n"
-        exp_data += exp_data_row
+if save_file:
+    # print(sensor_list_exp)
+    # exp_data = "uid,lat,lng,"
+    exp_data = "uid,label,x"
+    for d in range(data_row_max_size):
+        exp_data += "," + str(d)
+    exp_data += "\n"
+    for sexp in sensor_list_exp:
+        if sexp["online"]:
+            exp_data_row = sexp["uid"] + "," + sexp["label"] + ",x"
+            len_data = len(sexp["data"])
+            for d in sexp["data"]:
+                exp_data_row += "," + str(d)
+            len_data_rem = data_row_max_size - len_data
+            for d in range(len_data_rem):
+                exp_data_row += ",0"
+            exp_data_row += "\n"
+            exp_data += exp_data_row
 
-result_name = root_data_folder + "/res"
-if rolling_filter:
-    result_name += "_rf"
-result_name += ".csv"
+    result_name = root_data_folder + "/res"
+    if rolling_filter:
+        result_name += "_rf"
+    result_name += ".csv"
 
-with open(result_name, "w") as f:
-    f.write(exp_data)
+    with open(result_name, "w") as f:
+        f.write(exp_data)

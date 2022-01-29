@@ -9,6 +9,30 @@ import matplotlib.cm as cm
 import math
 from modules import graph
 
+FSIZE_TITLE = 16
+FSIZE_LABEL = 14
+FSIZE_LABEL_S = 14
+FSIZE_LABEL_XS = 12
+OPACITY = 0.9
+OPACITY = 1
+
+def set_disp_ax(ax, title, xlabel, ylabel):
+    if title:
+        ax.set_title(title,  fontsize=FSIZE_TITLE)
+    if xlabel:
+        ax.set_xlabel(xlabel, fontsize=FSIZE_LABEL)
+    if ylabel:
+        ax.set_ylabel(ylabel, fontsize=FSIZE_LABEL)
+
+
+def set_disp(title, xlabel, ylabel):
+    if title:
+        plt.gca().set_title(title, fontsize=FSIZE_TITLE, pad=10)
+    if xlabel:
+        plt.xlabel(xlabel, fontsize=FSIZE_LABEL)
+    if ylabel:
+        plt.ylabel(ylabel, fontsize=FSIZE_LABEL)
+
 
 def plot_data(X):
     # Let's see the points generated more visual. Plot the points using matplotlib
@@ -30,12 +54,15 @@ def plot_data_with_clusters(X, kmeans, show_centers=False, xlabel=None, ylabel=N
         plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[
                     :, 1], color="orange", s=(200, 200), label="centroids", marker="o")
 
-    plt.title('K-Means Clustering')
+    title = 'K-Means Clustering'
+    plt.title(title)
     if xlabel:
         plt.xlabel(xlabel)
     if ylabel:
         plt.ylabel(ylabel)
     plt.legend(loc='upper left')
+
+    set_disp(title, xlabel, ylabel)
     plt.xticks()
     if show:
         plt.show()

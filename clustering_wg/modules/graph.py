@@ -66,7 +66,7 @@ class CMapMatrixElement:
 
 
 def plot(y, x, title, xlabel, ylabel, show):
-    fig = plt.figure(figsize=(8,6))
+    fig = plt.figure(figsize=(8, 6))
     if x is None:
         plt.plot(y)
     else:
@@ -141,7 +141,7 @@ def plot_xy(x, y, rads, labels, colors, title, xlabel, ylabel, scale, show_legen
 
 def plot_timeseries_multi_sub2(timeseries_arrays: List[List[Timeseries]], title, xlabel, ylabel, figsize, ndivx, ndiv, xlabels=None, show=True, id=0):
     matplotlib.style.use('default')
-  
+
     if not figsize:
         fig = plt.figure(id, figsize=(16, 8))
         # fig = plt.figure(id)
@@ -296,8 +296,8 @@ def plot_timeseries(timeseries: Timeseries, title, xlabel, ylabel):
     return fig
 
 
-def save_figure(fig, file):
-    fig.savefig(file, dpi=300)
+def save_figure(fig, file, dpi=300):
+    fig.savefig(file, dpi=dpi)
 
 
 def set_disp_ax(ax, title, xlabel, ylabel):
@@ -480,7 +480,7 @@ def plot_barchart_multi_core_raw(data, colors, labels, xlabel, ylabel, title, xl
     else:
         bar_width = 1 / (n_groups + 1)
 
-    bar_width = 1
+    # bar_width = 1
 
     if offset is None:
         # offset = -1 / (n_groups * 2 * bar_width + 1)
@@ -488,11 +488,12 @@ def plot_barchart_multi_core_raw(data, colors, labels, xlabel, ylabel, title, xl
             offset = bar_width / 2
         else:
             # offset = -bar_width / n_groups
-            offset = -1 / ((n_groups + 1) / 2) - bar_width
+            # offset = -1 / ((n_groups + 1) / 2) - bar_width
+             offset = -1 / ((n_groups + 1) / 2)
             # offset = 0
             # offset = -1 / ((n_groups + 1) / 2) + bar_width*3/2
             # pass
-    offset = 0
+    # offset = 0
 
     opacity = OPACITY
 
@@ -522,9 +523,9 @@ def plot_barchart_multi_core_raw(data, colors, labels, xlabel, ylabel, title, xl
         if high1 is not None:
             if high1 > high:
                 high = high1
-
+        print(data[i])
         rb = plt.bar(
-            index + offset,
+            index + offset + i * bar_width,
             data[i],
             bar_width,
             alpha=opacity,

@@ -33,7 +33,8 @@ start_col = 3
 end_col = 3
 fill_start = False
 
-savefig = False
+savefig = True
+savefile = False
 
 nc = 3
 
@@ -43,7 +44,7 @@ df = loader.load_dataset_pd(result_name)
 filter_labels = []
 filter_labels = ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"]
 # filter_labels = ["chiuveta_rece", "chiuveta_calda"]
-# filter_labels = ["chiuveta_rece"]
+filter_labels = ["chiuveta_rece"]
 # filter_labels = ["chiuveta_calda"]
 # filter_labels = ["dus"]
 # filter_labels = ["toaleta"]
@@ -51,7 +52,9 @@ filter_labels = ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"]
 # filter_labels = ["masina_spalat_vase"]
 # fname = "dus"
 # fname = "toaleta"
-fname = "all"
+# fname = "all"
+# fname = "chiuveta_calda"
+fname = "chiuveta_rece"
 
 
 if len(filter_labels) > 0:
@@ -115,10 +118,11 @@ for cd in cluster_data:
     res_data += str(cd["label"]) + "," + str(cd["count"]) + "," + str(cd["disp"]
                                                                       ) + "," + str(cd["centroid"][0]) + "," + str(cd["centroid"][1]) + "\n"
 # print(centroids)
-result_name = root_data_folder + "/res_" + fname + ".csv"
-with open(result_name, "w") as f:
-    f.write(res_data)
-quit()
+if savefile:
+    result_name = root_data_folder + "/res_" + fname + ".csv"
+    with open(result_name, "w") as f:
+        f.write(res_data)
+# quit()
 
 # plot the results
 fig = clustering.plot_data_with_clusters(

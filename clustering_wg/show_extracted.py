@@ -38,7 +38,7 @@ def run_clustering(x, nc, xheader, xlabels=None):
         print("optimal number of clusters: " + str(nc) +
               " (" + str(max_silhouette_score) + ")")
     else:
-        X, kmeans, centroids, silhouette_score, WCSS, average_euclid_dist_mean = clustering.clustering_kmeans(
+        X, kmeans, centroids, silhouette_score, WCSS, average_euclid_dist_mean, _ = clustering.clustering_kmeans(
             x, nc, True)
         # X, kmeans, centroids, avg_dist, sum_dist, average_euclid_dist_mean = clustering.clustering_birch(x, nc, True)
 
@@ -166,9 +166,9 @@ if plot_all_data:
         xlabels_disp = np.transpose(xlabels_disp)
     tss = utils.create_timeseries(xplot, header, xlabels_disp)
     fig = graph.plot_timeseries_multi_sub2(
-        [tss], [title], "x [samples]", [xlabel], (16, 9), 14, None, None, True, 0)
+        [tss], [title], "x [samples]", [xlabel], (8, 6), 14, None, None, True, 0)
     result_name = "./figs/consumer_data"
-    graph.save_figure(fig, result_name)
+    graph.save_figure(fig, result_name, 200)
 
 xlabels_disp = xlabels
 # cluster labels
@@ -190,8 +190,8 @@ title = "weekly consumer patterns (" + str(nc) + "c)"
 ylabel = "y [L/h]"
 
 fig = graph.plot_timeseries_multi_sub2(
-    [tss], [title], "x [samples]", [ylabel], (16, 9), 14, None, None, True, 1)
+    [tss], [title], "x [samples]", [ylabel], (8, 6), 14, None, None, True, 1)
 
 result_name = "./figs/consumer_patterns_" + str(nc) + "c"
 
-graph.save_figure(fig, result_name)
+graph.save_figure(fig, result_name, 200)
