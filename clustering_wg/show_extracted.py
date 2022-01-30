@@ -17,7 +17,7 @@ def run_clustering(x, nc, xheader, xlabels=None):
         optimal_number_of_clusters = 2
         r = range(2, 20)
         for nc1 in r:
-            X, kmeans, centroids, silhouette_score, WCSS, average_euclid_dist_mean = clustering.clustering_kmeans(
+            X, kmeans, centroids, silhouette_score, WCSS, average_euclid_dist_mean, _ = clustering.clustering_kmeans(
                 x, nc1, True)
             silhouette_score_vect.append(silhouette_score)
             WCSS_vect.append(WCSS)
@@ -64,7 +64,7 @@ def run_clustering(x, nc, xheader, xlabels=None):
     return tss, nc
 
 
-nc = 2
+nc = 3
 
 root_data_folder = "./data"
 # read the data from the csv file
@@ -91,7 +91,7 @@ end_col = None
 fill_start = False
 
 filter_labels = []
-filter_labels = ["toaleta", "chiuveta_rece", "chiuveta_calda"]
+filter_labels = ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"]
 # filter_labels = ["toaleta"]
 
 x, header = loader.load_dataset(result_name)
@@ -111,6 +111,8 @@ nheader = len(header)
 sx = np.shape(x)
 
 print(sx)
+
+# quit()
 print(nheader)
 header = []
 for d in range(sx[0]):
@@ -185,13 +187,14 @@ x = np.transpose(x)
 tss, nc = run_clustering(x, nc, xheader, xlabels_disp)
 
 # plot cluster centroids
-title = "weekly consumer patterns (" + str(nc) + "c)"
+title = "consumer patterns (" + str(nc) + "c)"
 
 ylabel = "y [L/h]"
 
 fig = graph.plot_timeseries_multi_sub2(
-    [tss], [title], "x [samples]", [ylabel], (8, 6), 14, None, None, True, 1)
+    [tss], [title], "x [samples]", [ylabel], (8, 6), 7, None, None, True, 1)
 
 result_name = "./figs/consumer_patterns_" + str(nc) + "c"
 
 graph.save_figure(fig, result_name, 200)
+
