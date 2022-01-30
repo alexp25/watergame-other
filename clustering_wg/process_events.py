@@ -41,20 +41,23 @@ nc = 3
 x, header = loader.load_dataset(result_name)
 df = loader.load_dataset_pd(result_name)
 
-filter_labels = []
-filter_labels = ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"]
-# filter_labels = ["chiuveta_rece", "chiuveta_calda"]
-filter_labels = ["chiuveta_rece"]
-# filter_labels = ["chiuveta_calda"]
-# filter_labels = ["dus"]
-# filter_labels = ["toaleta"]
-# filter_labels = ["masina_spalat"]
-# filter_labels = ["masina_spalat_vase"]
+
 # fname = "dus"
-# fname = "toaleta"
+fname = "toaleta"
 # fname = "all"
 # fname = "chiuveta_calda"
-fname = "chiuveta_rece"
+# fname = "chiuveta_rece"
+
+filter_labels = []
+# filter_labels = ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"]
+# filter_labels = ["chiuveta_rece", "chiuveta_calda"]
+# filter_labels = ["chiuveta_rece"]
+# filter_labels = ["chiuveta_calda"]
+# filter_labels = ["dus"]
+filter_labels = ["toaleta"]
+# filter_labels = ["masina_spalat"]
+# filter_labels = ["masina_spalat_vase"]
+
 
 
 if len(filter_labels) > 0:
@@ -62,7 +65,7 @@ if len(filter_labels) > 0:
     df = df[boolean_series]
     # df["duration"] > 0
     df = df[df["volume"] >= 1]
-    # df = df[df["duration"] < 10]
+    df = df[df["duration"] < 10]
     # df = df[df['label'] == filter_labels]
 
 print(df)
@@ -137,7 +140,7 @@ result_name = "./figs/event_clusters_" + fname + "_" + str(nc) + "c"
 if savefig:
     graph.save_figure(fig, result_name)
 
-quit()
+# quit()
 r = range(2, 20)
 silhouette_score_vect = []
 WCSS_vect = []
@@ -147,7 +150,7 @@ max_silhouette_score = 0
 
 for i in r:
     # run the k-means algorithm with i clusters
-    X, kmeans, centroids, average_silhouette_score, wcss, average_euclid_dist_mean = clustering.clustering_kmeans(
+    X, kmeans, centroids, average_silhouette_score, wcss, average_euclid_dist_mean, _ = clustering.clustering_kmeans(
         x, i, True)
     # save the results into a list
     silhouette_score_vect.append(average_silhouette_score)
@@ -159,14 +162,21 @@ for i in r:
 
 # plot the results
 print("optimal number of clusters: ", optimal_number_of_clusters)
+fig = plt.figure(1, figsize=(8, 6))
 plt.subplot(211)
 plt.plot(r, silhouette_score_vect)
-plt.title("Clustering evaluation")
-plt.legend(["silhouette score"])
+# plt.legend(["silhouette score"])
 plt.xticks(r)
+plt.grid()
+clustering.set_disp("Clustering evaluation", "", "silhouette score")
 plt.subplot(212)
 plt.plot(r, WCSS_vect)
-plt.legend(["WCSS"])
+# plt.legend(["WCSS"])
 plt.xticks(r)
-plt.xlabel("k")
+plt.grid()
+clustering.set_disp("", "k", "WCSS")
 plt.show()
+result_name = "./figs/event_clusters_" + fname + "_eval"
+
+if savefig:
+    graph.save_figure(fig, result_name)
