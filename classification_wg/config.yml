@@ -1,4 +1,5 @@
-filenames: ["res_evt"]
+filename: "res_evt"
+modelname: "res_evt_1"
 root_data_folder: "data"
 root_model_folder: "models"
 root_model_container: "models/m1"

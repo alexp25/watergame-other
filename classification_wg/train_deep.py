@@ -24,8 +24,8 @@ with open("config.yml", "r") as f:
 
 root_data_folder = config["root_data_folder"]
 root_model_folder = config["root_model_folder"]
-filenames = config["filenames"]
-filename = filenames[0]
+filename = config["filename"]
+modelname = config["modelname"]
 
 if config["run_clean"]:
     loader.clean(root_model_folder)
@@ -119,7 +119,11 @@ acc_test_vect = {
 for i in range(n_reps):
     print("evaluating model rep: " + str(i) + "/" + str(n_reps))
     # session = K.get_session()
-    model_file = root_model_folder + "/" + filename
+    model_file = root_model_folder + "/" + modelname
+    if use_rnn:
+        model_file += "_rnn"
+    else:
+        model_file += "_dense"
     model_file_raw = model_file
     model_file_raw += "_" + str(i+1)
     if append_timestamp:

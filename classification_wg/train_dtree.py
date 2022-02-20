@@ -20,8 +20,8 @@ with open("config.yml", "r") as f:
 
 root_data_folder = config["root_data_folder"]
 root_model_folder = config["root_model_folder"]
-filenames = config["filenames"]
-filename = filenames[0]
+filename = config["filename"]
+modelname = config["modelname"]
 
 method = "dtree"
 method = "randomforest"
@@ -106,7 +106,7 @@ top_model_filename = None
 sizey = np.shape(y)
 
 for rep in range(n_reps):
-    model_file = root_model_folder + "/" + filename
+    model_file = root_model_folder + "/" + modelname
     model_file_raw = model_file
     model_file_raw += "_" + str(rep+1)
 

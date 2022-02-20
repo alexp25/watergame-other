@@ -59,7 +59,7 @@ norm = False
 extract_inst_flow = False
 extract_inst_flow = True
 
-save_file = False
+save_file = True
 
 rolling_filter = True
 rolling_filter = False

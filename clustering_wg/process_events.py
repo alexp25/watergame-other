@@ -38,23 +38,27 @@ savefile = False
 
 nc = 3
 
+eval_nc = True
+eval_nc = False
+
 x, header = loader.load_dataset(result_name)
 df = loader.load_dataset_pd(result_name)
 
 
 # fname = "dus"
-fname = "toaleta"
+# fname = "toaleta"
 # fname = "all"
 # fname = "chiuveta_calda"
 # fname = "chiuveta_rece"
+fname = "temp"
 
 filter_labels = []
 # filter_labels = ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"]
 # filter_labels = ["chiuveta_rece", "chiuveta_calda"]
 # filter_labels = ["chiuveta_rece"]
 # filter_labels = ["chiuveta_calda"]
-# filter_labels = ["dus"]
-filter_labels = ["toaleta"]
+filter_labels = ["dus"]
+# filter_labels = ["toaleta"]
 # filter_labels = ["masina_spalat"]
 # filter_labels = ["masina_spalat_vase"]
 
@@ -139,6 +143,9 @@ result_name = "./figs/event_clusters_" + fname + "_" + str(nc) + "c"
 
 if savefig:
     graph.save_figure(fig, result_name)
+
+if not eval_nc:
+    quit()
 
 # quit()
 r = range(2, 20)
