@@ -50,7 +50,7 @@ cmap = matplotlib.cm.get_cmap('viridis')
 color_scheme = [cmap(i) for i in np.linspace(0, 1, len(files))]
 print(color_scheme)
 
-fig, _ = graph.plot_barchart_multi_core_raw(acc, color_scheme, ["train", "test"], "Year", "Accuracy [%]",
+fig, _ = graph.plot_barchart_multi_core_raw(acc, color_scheme, ["train", "test"], "model", "accuracy [%]",
                                             "Classification accuracy", ["Decision Tree",
                                                      "Random Forest", "Dense", "RNN"],
                                             limits,
