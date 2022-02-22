@@ -32,9 +32,13 @@ for row in df.iterrows():
                 if np.isnan(rowspec[dl]):
                     pass
             except:
-                sensor_spec["labels"].append(rowspec[dl])
+                label = rowspec[dl]
+                if label in ['chiuveta_calda', 'chiuveta_rece']:
+                    label = label + '_' + rowspec["tip_loc"]  
+                sensor_spec["labels"].append(label)
                 pass
-        for k, label in enumerate(sensor_spec["labels"]):
+            
+        for k, label in enumerate(sensor_spec["labels"]):                      
             sensor_list_exp.append({
                 "online": False,
                 "id": int(rowspec["id"]),
@@ -148,6 +152,10 @@ for plot_index, sensor_spec in enumerate(sensor_list):
         "dus": "shower",
         "chiuveta_rece": "sink_cold",
         "chiuveta_calda": "sink_hot",
+        "chiuveta_rece_baie": "sink_cold_bath",
+        "chiuveta_calda_baie": "sink_hot_batch",
+        "chiuveta_rece_bucatarie": "sink_cold_kitchen",
+        "chiuveta_calda_bucatarie": "sink_hot_kitchen",
         "toaleta": "toilet",
         "masina_spalat": "washing_machine",
         "masina_spalat_vase": "dishwasher"
@@ -203,7 +211,8 @@ if save_file:
     exp_data += "\n"
     for sexp in sensor_list_exp:
         if sexp["online"]:
-            exp_data_row = sexp["uid"] + "," + sexp["label"] + ",x"
+            label = sexp["label"]
+            exp_data_row = sexp["uid"] + "," + label + ",x"
             len_data = len(sexp["data"])
             for d in sexp["data"]:
                 exp_data_row += "," + str(d)

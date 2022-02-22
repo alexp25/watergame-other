@@ -49,7 +49,7 @@ data_file = root_data_folder + "/" + filename + ".csv"
 
 df = loader.load_dataset_pd(data_file)
 filter_labels = []
-filter_labels = ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"]
+filter_labels = config["filter_labels"]
 
 if len(filter_labels) > 0:
     boolean_series = df['label'].isin(filter_labels)

@@ -40,7 +40,7 @@ if n_reps > 1:
 else:
     save_best_model = False
 
-use_rnn = False
+use_rnn = True
 
 prep = Preprocessing()
 
@@ -48,14 +48,15 @@ data_file = root_data_folder + "/" + filename + ".csv"
 
 df = loader.load_dataset_pd(data_file)
 filter_labels = []
-filter_labels = ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"]
+filter_labels = config["filter_labels"]
 
 if len(filter_labels) > 0:
     boolean_series = df['label'].isin(filter_labels)
     df = df[boolean_series]
-    # df["duration"] > 0
-    df = df[df["volume"] >= 1]
-    # df = df[df["duration"] < 10]
+
+# df["duration"] > 0
+df = df[df["volume"] >= 1]
+# df = df[df["duration"] < 10]
 
 df = loader.format_data(df)
 print(df)
@@ -134,6 +135,8 @@ for i in range(n_reps):
     # create tensorflow graph session
     graph = tf.Graph()
     with tf.compat.v1.Session(graph=graph):
+        acc_train = 0
+        acc_test = 0
         if use_rnn:
             tstart = time.time()
             model = deep_learning.create_model_RNN(x_train, y_train, config["activation_fn"], config["loss_fn"])
@@ -142,7 +145,9 @@ for i in range(n_reps):
             fsize = os.stat(model_file).st_size
             deep_learning.eval_write_info_RNN(
                 model, x_eval, y_eval, model_file, dt, fsize)
-            acc = deep_learning.eval_model_RNN(
+            acc_train = deep_learning.eval_model_RNN(
+                model, x_train, y_train, sizex[1])
+            acc_test = deep_learning.eval_model_RNN(
                 model, x_eval, y_eval, sizex[1])
         else:
             tstart = time.time()
@@ -152,18 +157,20 @@ for i in range(n_reps):
             fsize = os.stat(model_file).st_size
             deep_learning.eval_write_info(
                 model, x_eval, y_eval, model_file, dt, fsize)
-            acc = deep_learning.eval_model(
+            acc_train = deep_learning.eval_model(
+                model, x_train, y_train, sizex[1], use_rnn)
+            acc_test = deep_learning.eval_model(
                 model, x_eval, y_eval, sizex[1], use_rnn)
 
         acc_train_vect["files"].append(model_file)
-        acc_train_vect["acc"].append(acc)
+        acc_train_vect["acc"].append(acc_train)
 
-        if acc > top_acc:
-            top_acc = acc
+        if acc_test > top_acc:
+            top_acc = acc_test
             top_model_filename = model_file_raw
 
         acc_test_vect["files"].append(model_file)
-        acc_test_vect["acc"].append(acc)
+        acc_test_vect["acc"].append(acc_test)
 
         if i == n_reps - 1:
             if save_best_model:
