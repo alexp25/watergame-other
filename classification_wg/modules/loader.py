@@ -41,11 +41,9 @@ def load_model_result_file(filename):
     return accuracy, dt, fsize
 
 
-def format_data(df):
+def format_data(df, map):
     # format the data, map classes to numbers
-    d = {'chiuveta_rece': 1, 'chiuveta_calda': 2, "toaleta": 3,
-         "dus": 4, "masina_spalat": 5, "masina_spalat_vase": 6}
-    df['label'] = df['label'].map(d)
+    df['label'] = df['label'].map(map)
     return df
 
 
@@ -87,12 +85,9 @@ def load_dataset_pd(input_file):
     return dataFrame
 
 
-def load_dataset(input_file, fd):
-    # read the csv data (HR dataset)
+def load_dataset(input_file):
     dataFrame = pd.read_csv(input_file, header=0)
-    if fd:
-        dataFrame = format_data(dataFrame)
-
+    
     # get input/target datasets
     X, y, features, classes = get_dataset_xy(dataFrame)
 

@@ -7,8 +7,8 @@ import numpy as np
 import json
 
 # import our modules
-from modules import classifiers
-from modules import deep_learning, loader
+from modules import classifiers, model_loader
+from modules import deep_learning, loader, graph
 import tensorflow as tf
 from keras import backend as K
 from keras.utils import to_categorical
@@ -25,7 +25,7 @@ def plot_confusion_matrix(l, p, c):
   conf_mat=confusion_matrix(l, p)
   # print(conf_mat)
   nb_classes = len(c)
-  plt.figure(figsize=(10,7))
+  fig = plt.figure(figsize=(10,7))
 
   class_names = list(c)
   conf_mat = conf_mat.astype(float)
@@ -37,11 +37,14 @@ def plot_confusion_matrix(l, p, c):
   heatmap = sn.heatmap(df_cm, annot=True, cmap="mako")
   # "YlGnBu"
 
-  heatmap.yaxis.set_ticklabels(heatmap.yaxis.get_ticklabels(), rotation=0, ha='right',fontsize=15)
-  heatmap.xaxis.set_ticklabels(heatmap.xaxis.get_ticklabels(), rotation=45, ha='right',fontsize=15)
-  plt.ylabel('True label')
-  plt.xlabel('Predicted label')
+  heatmap.yaxis.set_ticklabels(heatmap.yaxis.get_ticklabels(), rotation=0, ha='right',fontsize=12)
+  heatmap.xaxis.set_ticklabels(heatmap.xaxis.get_ticklabels(), rotation=0, ha='right',fontsize=12)
+
+  plt.title('Confusion Matrix', fontsize=18)
+  plt.ylabel('True label', fontsize=16)
+  plt.xlabel('Predicted label', fontsize=16)
   plt.show()
+  graph.save_figure(fig, "./figs/eval_conf_matrix")
 
 with open("config.yml", "r") as f:
     config = yaml.load(f)
@@ -65,7 +68,7 @@ if len(filter_labels) > 0:
 
 df = df[df["volume"] >= 1]
 
-df = loader.format_data(df)
+df = loader.format_data(df, config["map_labels"])
 df = df.sample(frac=1, random_state=42).reset_index(drop=True)
 X, y, features, classes = loader.get_dataset_xy(df)
 X = X.to_numpy()
@@ -89,17 +92,28 @@ x_eval, y_eval = classifiers.split_dataset_test(
     X, y, train_percent)
 
 print(classes)
-
-model = deep_learning.dl_load_model(model_to_eval)
+classes = config["class_labels"]
 y_class_target = np.argmax(y_train, axis=1)
 print('TARGET')
 for i in range(len(classes)):
     print('Class = ', i)
     print(y_class_target[y_class_target == i].shape)
 
-y_pred = model.predict(x_train)
-print(y_pred.shape)
-y_class = np.argmax(y_pred, axis=1)
+
+if "h5" in model_to_eval:
+    model = deep_learning.dl_load_model(model_to_eval)
+    y_pred = model.predict(x_train)
+    print(y_pred.shape)
+    y_class = np.argmax(y_pred, axis=1)
+else:
+    model = model_loader.load_sklearn_model(model_to_eval)
+    # print_tree.plot_decision_tree(model, features, classes, "dtree.png")
+    res = deep_learning.reshape_RNN(x_train)
+    x_train = res[0]
+    y_pred = model.predict(x_train)
+    print(y_pred.shape)
+    y_class = y_pred
+
 print('PREDICTIONS')
 for i in range(len(classes)):
     print('Class = ', i)

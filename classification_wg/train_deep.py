@@ -41,8 +41,8 @@ if n_reps > 1:
 else:
     save_best_model = False
 
-use_rnn = False
-use_scaler = True
+use_rnn = True
+use_scaler = config["use_normalization"]
 
 prep = Preprocessing()
 
@@ -60,7 +60,7 @@ if len(filter_labels) > 0:
 df = df[df["volume"] >= 1]
 # df = df[df["duration"] < 10]
 
-df = loader.format_data(df)
+df = loader.format_data(df, config["map_labels"])
 print(df)
 
 # shuffle dataset rows

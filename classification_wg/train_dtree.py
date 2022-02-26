@@ -24,7 +24,7 @@ filename = config["filename"]
 modelname = config["modelname"]
 
 method = "dtree"
-method = "randomforest"
+# method = "randomforest"
 
 n_reps = 5
 use_saved_model = False
@@ -58,7 +58,7 @@ if len(filter_labels) > 0:
     df = df[df["volume"] >= 1]
     # df = df[df["duration"] < 10]
 
-df = loader.format_data(df)
+df = loader.format_data(df, config["map_labels"])
 print(df)
 
 # shuffle dataset rows
