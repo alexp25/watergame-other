@@ -11,3 +11,5 @@ train_percent: 80
 activation_fn: "softmax"
 loss_fn: "categorical_crossentropy"
 run_clean: False
+model_to_eval: "./models/res_evt_1_dense_1.h5"
+use_normalization: True

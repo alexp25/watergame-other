@@ -15,6 +15,7 @@ import yaml
 from modules.preprocessing import Preprocessing
 from modules import generator
 from modules import preprocessing
+from sklearn.preprocessing import MinMaxScaler
 
 # import tensorflow.compat.v1 as tf
 # tf.disable_v2_behavior()
@@ -41,6 +42,7 @@ else:
     save_best_model = False
 
 use_rnn = False
+use_scaler = True
 
 prep = Preprocessing()
 
@@ -73,6 +75,13 @@ df = df.sample(frac=1, random_state=42).reset_index(drop=True)
 X, y, features, classes = loader.get_dataset_xy(df)
 X = X.to_numpy()
 y = y.to_numpy()
+
+if use_scaler:
+    y = y[X[:, 1]<1000]
+    X = X[X[:, 1]<1000]
+    train_scaler = MinMaxScaler()
+    train_scaler.fit(X)
+    X = train_scaler.transform(X)
 
 # convert categories to required format for neural networks (one-hot encoding)
 y = to_categorical(y)
