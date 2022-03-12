@@ -20,20 +20,14 @@ batch_size = 10
 def reshape_RNN(X):
     print("reshape RNN")
     sizex = np.shape(X)
-
     # batch_size = 1
     # time_step = sizex[0]
     # data_dim = sizex[1]
-
     batch_size = sizex[0]
     time_step = 1
     data_dim = sizex[1]
-
-    # X_train = np.reshape(X, (batch_size, time_step, data_dim))
     X_train = np.reshape(X, (batch_size, time_step, data_dim))
-
     # [samples, timesteps, features]
-
     return X_train, batch_size, time_step, data_dim
 
 

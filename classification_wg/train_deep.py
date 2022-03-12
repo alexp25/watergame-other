@@ -16,6 +16,7 @@ from modules.preprocessing import Preprocessing
 from modules import generator
 from modules import preprocessing
 from sklearn.preprocessing import MinMaxScaler
+import apply_filters
 
 # import tensorflow.compat.v1 as tf
 # tf.disable_v2_behavior()
@@ -52,13 +53,10 @@ df = loader.load_dataset_pd(data_file)
 filter_labels = []
 filter_labels = config["filter_labels"]
 
-if len(filter_labels) > 0:
-    boolean_series = df['label'].isin(filter_labels)
-    df = df[boolean_series]
+df = apply_filters.apply_filter_labels(df, filter_labels) 
 
-# df["duration"] > 0
-df = df[df["volume"] >= 1]
-# df = df[df["duration"] < 10]
+if config["apply_balancing"]:
+    df = apply_filters.apply_balancing(df, filter_labels)
 
 df = loader.format_data(df, config["map_labels"])
 print(df)
@@ -77,8 +75,8 @@ X = X.to_numpy()
 y = y.to_numpy()
 
 if use_scaler:
-    y = y[X[:, 1]<1000]
-    X = X[X[:, 1]<1000]
+    y = y[X[:, 1] < 1000]
+    X = X[X[:, 1] < 1000]
     train_scaler = MinMaxScaler()
     train_scaler.fit(X)
     X = train_scaler.transform(X)
@@ -148,7 +146,8 @@ for i in range(n_reps):
         acc_test = 0
         if use_rnn:
             tstart = time.time()
-            model = deep_learning.create_model_RNN(x_train, y_train, config["activation_fn"], config["loss_fn"])
+            model = deep_learning.create_model_RNN(
+                x_train, y_train, config["activation_fn"], config["loss_fn"])
             dt = time.time() - tstart
             deep_learning.dl_save_model(model, model_file)
             fsize = os.stat(model_file).st_size
@@ -160,7 +159,8 @@ for i in range(n_reps):
                 model, x_eval, y_eval, sizex[1])
         else:
             tstart = time.time()
-            model = deep_learning.create_model(x_train, y_train, config["activation_fn"], config["loss_fn"])
+            model = deep_learning.create_model(
+                x_train, y_train, config["activation_fn"], config["loss_fn"])
             dt = time.time() - tstart
             deep_learning.dl_save_model(model, model_file)
             fsize = os.stat(model_file).st_size
@@ -184,9 +184,10 @@ for i in range(n_reps):
         if i == n_reps - 1:
             if save_best_model:
                 copy2(top_model_filename + ".h5",
-                        top_model_filename + "_top.h5")
+                      top_model_filename + "_top.h5")
                 copy2(top_model_filename + ".h5.txt",
-                        top_model_filename + "_top.h5.txt")
+                      top_model_filename + "_top.h5.txt")
+
 
 def set_avg(dc):
     # for each input file (experiment)
@@ -196,6 +197,7 @@ def set_avg(dc):
     dc["best_model"] = dc["files"][np.argmax(acc_vect)]
     print(dc)
 
+
 set_avg(acc_train_vect)
 set_avg(acc_test_vect)
 
@@ -204,11 +206,13 @@ set_avg(acc_test_vect)
 # print("\ntest vect")
 # print(json.dumps(acc_test_vect))
 
+
 def extract_csv(vect):
     csvoutput = ""
     csvoutput = str(vect["avg"]) + "," + str(vect["top"]) + \
         "," + str(vect["best_model"]) + "\n"
     return csvoutput
+
 
 csvoutput = extract_csv(acc_train_vect)
 

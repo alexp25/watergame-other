@@ -19,6 +19,7 @@ from modules.preprocessing import Preprocessing
 from modules import generator
 from modules import preprocessing
 from sklearn.preprocessing import MinMaxScaler
+import apply_filters
 
 def plot_confusion_matrix(l, p, c):
   # Confusion matrix
@@ -62,11 +63,10 @@ filter_labels = []
 filter_labels = config["filter_labels"]
 print(filter_labels)
 
-if len(filter_labels) > 0:
-    boolean_series = df['label'].isin(filter_labels)
-    df = df[boolean_series]
+df = apply_filters.apply_filter_labels(df, filter_labels) 
 
-df = df[df["volume"] >= 1]
+if config["apply_balancing"]:
+    df = apply_filters.apply_balancing(df, filter_labels)
 
 df = loader.format_data(df, config["map_labels"])
 df = df.sample(frac=1, random_state=42).reset_index(drop=True)
@@ -102,14 +102,18 @@ for i in range(len(classes)):
 
 if "h5" in model_to_eval:
     model = deep_learning.dl_load_model(model_to_eval)
+    if 'rnn' in model_to_eval:
+        # res = deep_learning.reshape_RNN(x_train)
+        # x_train = res[0]   
+        print(np.shape(x_train))     
     y_pred = model.predict(x_train)
     print(y_pred.shape)
     y_class = np.argmax(y_pred, axis=1)
 else:
     model = model_loader.load_sklearn_model(model_to_eval)
     # print_tree.plot_decision_tree(model, features, classes, "dtree.png")
-    res = deep_learning.reshape_RNN(x_train)
-    x_train = res[0]
+    # res = deep_learning.reshape_RNN(x_train)
+    # x_train = res[0]
     y_pred = model.predict(x_train)
     print(y_pred.shape)
     y_class = y_pred

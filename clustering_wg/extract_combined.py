@@ -10,6 +10,7 @@ import numpy as np
 root_data_folder = "./data"
 # read the data from the csv file
 
+extract_locations = False
 
 # load sensors list
 data_file = root_data_folder + "/" + "setup.csv"
@@ -33,8 +34,9 @@ for row in df.iterrows():
                     pass
             except:
                 label = rowspec[dl]
-                if label in ['chiuveta_calda', 'chiuveta_rece']:
-                    label = label + '_' + rowspec["tip_loc"]  
+                if extract_locations:
+                    if label in ['chiuveta_calda', 'chiuveta_rece']:
+                        label = label + '_' + rowspec["tip_loc"]  
                 sensor_spec["labels"].append(label)
                 pass
             
