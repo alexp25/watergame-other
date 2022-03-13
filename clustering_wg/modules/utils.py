@@ -47,7 +47,7 @@ def reorder2d(x, order):
     return np.array(x_ord)
 
 
-def create_timeseries(data, header, datax=None):
+def create_timeseries(data, header, datax=None, datax2=None):
     tss: List[Timeseries] = []
     # colors = ['blue', 'red', 'green', 'orange']
     # colors = ['Red', 'Orange', 'Yellow', 'Green', 'Blue', 'Indigo']
@@ -74,8 +74,10 @@ def create_timeseries(data, header, datax=None):
             ck = 0
 
         for i in range(rows):
-            if datax is not None:
-                ts.x.append(datax[i][j])
+            if datax is not None:               
+                ts.x.append(datax[i][j])             
+            elif datax2 is not None:
+                ts.x.append(datax2[i])    
             else:
                 ts.x.append(i)
             ts.y.append(data[i][j])

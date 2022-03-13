@@ -7,6 +7,7 @@ from modules import clustering
 from modules import utils
 import numpy as np
 import matplotlib.pyplot as plt
+import statistics
 
 
 root_data_folder = "./data"
@@ -58,10 +59,14 @@ filter_labels = []
 # filter_labels = ["chiuveta_rece"]
 # filter_labels = ["chiuveta_calda"]
 # filter_labels = ["dus"]
-filter_labels = ["toaleta"]
+# filter_labels = ["toaleta"]
 # filter_labels = ["masina_spalat"]
 # filter_labels = ["masina_spalat_vase"]
 
+filter_uid = ["41364_1", "41364_2", "41364_3", "41364_4"]
+
+x, header = loader.load_dataset(result_name)
+df = loader.load_dataset_pd(result_name)
 
 
 if len(filter_labels) > 0:
@@ -71,11 +76,23 @@ if len(filter_labels) > 0:
     df = df[df["volume"] >= 1]
     df = df[df["duration"] < 10]
     # df = df[df['label'] == filter_labels]
+if len(filter_uid) > 0:
+    boolean_series = df['uid'].isin(filter_uid)
+    df = df[boolean_series]
 
 print(df)
 x = df.to_numpy()
 x = x[start_index:, start_col:]
 
+sx = np.shape(x)
+
+for filter_uid_1 in filter_uid:
+    boolean_series = df['uid'].isin([filter_uid_1])
+    df1 = df[boolean_series]
+    stdev = statistics.stdev(df1["volume"] * df1["duration"])
+    print("stdev ", filter_uid_1, " = ", stdev)
+
+# quit()
 # x = x[:,:1]
 
 print(x)

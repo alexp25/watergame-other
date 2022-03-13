@@ -6,6 +6,7 @@ from modules import loader, graph
 from modules import clustering
 from modules import utils
 import numpy as np
+import statistics
 
 
 def run_clustering(x, nc, xheader, xlabels=None):
@@ -42,17 +43,8 @@ def run_clustering(x, nc, xheader, xlabels=None):
             x, nc, True)
         # X, kmeans, centroids, avg_dist, sum_dist, average_euclid_dist_mean = clustering.clustering_birch(x, nc, True)
 
-    # print(avg_dist)
-    # print(sum_dist)
-    # print(average_euclid_dist_mean)
-
     print("silhouette score: ", silhouette_score)
-
-    # quit()
-
-    # quit()
     xc = np.transpose(centroids)
-    # xc = np.transpose(xc)
 
     if xlabels is not None:
         xlabels = np.array(xlabels)
@@ -64,7 +56,7 @@ def run_clustering(x, nc, xheader, xlabels=None):
     return tss, nc
 
 
-nc = 3
+nc = 1
 
 root_data_folder = "./data"
 # read the data from the csv file
@@ -78,33 +70,39 @@ if rolling_filter:
 result_name += ".csv"
 
 plot_all_data = True
-# plot_all_data = False
+plot_all_data = False
 
 rolling_filter = True
 rolling_filter = False
 
-start_index = 1
+start_index = 0
 # end_index = 100
-end_index = None
+end_index = 20160  # 2 weeks in minutes
 start_col = 3
 end_col = None
 fill_start = False
+n_days = 14
 
 filter_labels = []
-filter_labels = ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"]
+# filter_labels = ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"]
 # filter_labels = ["toaleta"]
+filter_uid = ["41364_1", "41364_2", "41364_3", "41364_4"]
+# filter_uid = []
 
 x, header = loader.load_dataset(result_name)
-
 df = loader.load_dataset_pd(result_name)
 
 if len(filter_labels) > 0:
     boolean_series = df['label'].isin(filter_labels)
     df = df[boolean_series]
-    # df = df[df['label'] == filter_labels]
+if len(filter_uid) > 0:
+    boolean_series = df['uid'].isin(filter_uid)
+    df = df[boolean_series]
 
 x = df.to_numpy()
 print(x)
+
+# quit()
 
 nheader = len(header)
 
@@ -112,14 +110,11 @@ sx = np.shape(x)
 
 print(sx)
 
-# quit()
 print(nheader)
 header = []
 for d in range(sx[0]):
-    # header.append(str(d+1))
     header.append(x[d, 0] + " - " + x[d, 1])
 print(header)
-# quit()
 
 if fill_start:
     x = x[start_index:, :]
@@ -133,6 +128,16 @@ if end_col is not None:
     x = x[:, :end_col]
 
 
+for consumer in range(sx[0]):
+    stdev = statistics.stdev(x[:, consumer])
+    print("stdev ", consumer, " = ", stdev)
+# quit()
+
+x_split = np.split(x, n_days)
+
+# print(x_split)
+
+
 xlabel = "flow [L/h]"
 xtype = "flow"
 title = "consumption data (flow)"
@@ -142,59 +147,75 @@ print(sx)
 
 print("start")
 
-
 # time axis labels
 xlabels = [str(i) for i in range(sx[0])]
-# xlabels_disp = [str(i%1440) for i in range(sx[0])]
 xlabels_disp = xlabels
-# xlabels = [str(i) for i in range(len(timestamps))]
-# xlabels = timestamps
-# xlabels = [np.datetime64(ts) for ts in timestamps]
 
-# print(xlabels)
-# quit()
-# xlabels = [str(e) for e in list(range(nheader-3))]
-# xlabels = None
+# header days
+header = [str(i) for i in range(len(x_split))]
+header = xlabels
 
-# xlabels = np.array(xlabels)
-# xlabels = np.transpose(xlabels)
-# print(xlabels)
+x_consumer_average_vect = []
 
-if plot_all_data:
-    xplot = x
-    xlabels_disp = [xlabels_disp] * sx[1]
+# for day in range(n_days):
+for consumer in range(sx[1]):
+    x_consumer = []
+    for days in x_split:
+        print(np.shape(days))
+        x_consumer.append(days[:, consumer])
+    x_consumer = np.transpose(np.array(x_consumer))
+
+    print(x_consumer)
+
+    sx = np.shape(x_consumer)
+
+    if plot_all_data:
+        xplot = x_consumer
+        xlabels_disp = [xlabels_disp] * sx[1]
+        if xlabels_disp is not None:
+            xlabels_disp = np.array(xlabels_disp)
+            xlabels_disp = np.transpose(xlabels_disp)
+        tss = utils.create_timeseries(xplot, header, xlabels_disp)
+        fig = graph.plot_timeseries_multi_sub2(
+            [tss], [title], "x [samples]", [xlabel], (8, 6), 14, None, None, True, 0)
+        result_name = "./figs/consumer_data"
+        graph.save_figure(fig, result_name, 200)
+
+    xlabels_disp = xlabels
+    # cluster labels
+    xheader = ["c" + str(i+1) for i in range(sx[1])]
+
     if xlabels_disp is not None:
-        xlabels_disp = np.array(xlabels_disp)
-        xlabels_disp = np.transpose(xlabels_disp)
-    tss = utils.create_timeseries(xplot, header, xlabels_disp)
-    fig = graph.plot_timeseries_multi_sub2(
-        [tss], [title], "x [samples]", [xlabel], (8, 6), 14, None, None, True, 0)
-    result_name = "./figs/consumer_data"
-    graph.save_figure(fig, result_name, 200)
+        if nc is None:
+            xlabels_disp = [xlabels_disp] * 1000
+        else:
+            xlabels_disp = [xlabels_disp] * nc
 
-xlabels_disp = xlabels
-# cluster labels
-xheader = ["c" + str(i+1) for i in range(sx[1])]
+    x_consumer_input = np.transpose(x_consumer)
 
-if xlabels_disp is not None:
-    if nc is None:
-        xlabels_disp = [xlabels_disp] * 1000
+    if nc == 1:
+        # average rows
+        x_consumer_average = x_consumer_input.mean(axis=0)
+        x_consumer_average_vect.append(x_consumer_average)
     else:
-        xlabels_disp = [xlabels_disp] * nc
+        tss, nc = run_clustering(x_consumer_input, nc, xheader, xlabels_disp)
+        # plot cluster centroids
+        title = "consumer patterns (" + str(nc) + "c)"
+        ylabel = "y [L/h]"
+        fig = graph.plot_timeseries_multi_sub2(
+            [tss], [title], "x [samples]", [ylabel], (8, 6), 10, None, None, True, 1)
 
-x = np.transpose(x)
+        # result_name = "./figs/consumer_patterns_day_" + str(nc) + "c"
+        # graph.save_figure(fig, result_name, 200)
 
-tss, nc = run_clustering(x, nc, xheader, xlabels_disp)
-
-# plot cluster centroids
-title = "consumer patterns (" + str(nc) + "c)"
-
-ylabel = "y [L/h]"
-
+print(x_consumer_average_vect)
+header = ["chiuveta_rece", "chiuveta_calda", "toaleta", "dus"]
+x_consumer_average_vect = np.array(x_consumer_average_vect)
+x_consumer_average_vect = np.transpose(x_consumer_average_vect)
+datax = [str(h) for h in list(range(0, 24*60))]
+tss = utils.create_timeseries(x_consumer_average_vect, header, None, None)
 fig = graph.plot_timeseries_multi_sub2(
-    [tss], [title], "x [samples]", [ylabel], (8, 6), 7, None, None, True, 1)
-
-result_name = "./figs/consumer_patterns_" + str(nc) + "c"
-
+    [tss], ["Daily consumption events"], "x [time of day]", [xlabel], (8, 6), 60, None, None, True, 0)
+result_name = "./figs/consumer_patterns_day_" + str(nc) + "c"
 graph.save_figure(fig, result_name, 200)
-
+# graph.plot(x_consumer_average, None, "consumer average", "x", "y", True)
