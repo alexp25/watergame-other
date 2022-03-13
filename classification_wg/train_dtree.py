@@ -1,3 +1,4 @@
+import random
 import numpy as np
 import pandas as pd
 
@@ -14,6 +15,7 @@ from modules.preprocessing import Preprocessing
 from modules import preprocessing
 from modules import generator
 from typing import List
+import apply_filters
 
 with open("config.yml", "r") as f:
     config = yaml.load(f)
@@ -46,19 +48,18 @@ if config["run_clean"] and not use_saved_model:
 # create separate models for each data file
 
 data_file = root_data_folder + "/" + filename + ".csv"
+print(data_file)
 
 df = loader.load_dataset_pd(data_file)
 filter_labels = []
 filter_labels = config["filter_labels"]
 
-if len(filter_labels) > 0:
-    boolean_series = df['label'].isin(filter_labels)
-    df = df[boolean_series]
-    # df["duration"] > 0
-    df = df[df["volume"] >= 1]
-    # df = df[df["duration"] < 10]
+df = apply_filters.apply_filter_labels(df, filter_labels) 
 
-df = loader.format_data(df)
+if config["apply_balancing"]:
+    df = apply_filters.apply_balancing(df, filter_labels)
+
+df = loader.format_data(df, config["map_labels"])
 print(df)
 
 # shuffle dataset rows
