@@ -240,6 +240,8 @@ print(x_consumer_average_vect)
 header = ["chiuveta_rece", "chiuveta_calda", "toaleta", "dus"]
 x_consumer_average_vect = np.array(x_consumer_average_vect)
 x_consumer_average_vect = np.transpose(x_consumer_average_vect)
+
+# adjust for starting time, roll to start with 0
 x_consumer_average_vect = np.roll(x_consumer_average_vect, 14*60, axis=0)
 
 datax = [str(h) for h in list(range(0, 24*60))]
@@ -247,7 +249,9 @@ datax_labels = [str(h//60) for h in list(range(0, 24*60))]
 datax_labels = ["0"+str(h % 24) if h < 10 else str(h % 24)
                 for h in list(range(0, 24))]  # original time in UTC (data rolled)
 tss = utils.create_timeseries(x_consumer_average_vect, header, None, datax)
+figsize = (12, 6)
+figsize = (8, 6)
 fig = graph.plot_timeseries_multi_sub2(
-    [tss], ["Daily consumption events"], "x [time of day]", [xlabel], (12, 6), 24, None, datax_labels, True, 0)
+    [tss], ["Daily consumption events"], "x [time of day]", [xlabel], figsize, 24, None, datax_labels, True, 0)
 result_name = "./figs/consumer_patterns_day_" + str(nc) + "c"
 graph.save_figure(fig, result_name, 200)

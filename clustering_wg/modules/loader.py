@@ -73,9 +73,11 @@ def load_dataset(filename):
     return x, header
 
 def load_dataset_pd(input_file):
-    # read the csv data (HR dataset)
     dataFrame = pd.read_csv(input_file, header=0)
     return dataFrame
+
+def write_dataset_pd(df, output_file):
+    df.to_csv(output_file, sep=',', encoding='utf-8')
 
 def remove_col(x, col):
     # numpy.delete(arr, obj, axis=None)
