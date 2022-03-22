@@ -11,8 +11,13 @@ import numpy as np
 root_data_folder = "./data"
 # read the data from the csv file
 
-result_name = root_data_folder + "/res"
+res_name = "res"
+
+result_name = root_data_folder + "/" + res_name
 result_name += ".csv"
+
+result_ts_name = root_data_folder + "/" + res_name + "_ts"
+result_ts_name += ".csv"
 
 plot_all_data = True
 # plot_all_data = False
@@ -27,8 +32,15 @@ fill_start = False
 x, header = loader.load_dataset(result_name)
 df = loader.load_dataset_pd(result_name)
 
+t, _ = loader.load_dataset(result_ts_name)
+df_ts = loader.load_dataset_pd(result_ts_name)
+
 x = df.to_numpy()
 print(x)
+
+x_ts = df_ts.to_numpy()
+
+print(x_ts)
 
 nheader = len(header)
 
@@ -42,10 +54,40 @@ events = []
 for i in range(sx[0]):
     print(i)
     data = x[i, start_col:]
+    data_ts = x_ts[i, start_col:]
     print(data)
-    cond = np.logical_and(data > 0, data > 0)
-    batch = np.split(data[cond], np.where(
-        np.diff(np.where(cond)[0]) > 1)[0] + 1)
+
+    batch = []
+    batch_idx = []
+    batch_start_ts = []
+    current_batch = []
+    current_batch_idx = []
+    batch_add_started = False
+    
+    for k in range(np.size(data, axis=0)):
+        if batch_add_started:
+            if data[k] > 0:
+                current_batch.append(data[k])
+                current_batch_idx.append(k)
+            else:
+                batch_add_started = False
+                batch.append(np.array(current_batch))
+                batch_idx.append(current_batch_idx)
+                batch_start_ts.append(data_ts[current_batch_idx[0]])
+                current_batch = []
+                current_batch_idx = []
+        else:
+            if data[k] > 0:
+                current_batch.append(data[k])
+                current_batch_idx.append(k)
+                batch_add_started = True
+
+    print(batch)
+  
+    # cond = np.logical_and(data > 0, data > 0)
+    # batch = np.split(data[cond], np.where(
+    #     np.diff(np.where(cond)[0]) > 1)[0] + 1)
+
 
     for j, event in enumerate(batch):
         # print(event)
@@ -57,7 +99,8 @@ for i in range(sx[0]):
             "event": j,
             "label": x[i, 1],
             "duration": duration,
-            "volume": volume
+            "volume": volume,
+            "ts": batch_start_ts[j]
         }
         # print(duration, average)
         print(new_event)
@@ -67,7 +110,7 @@ for i in range(sx[0]):
 exp_data = "uid,label,no,duration,volume\n"
 for evt in events:
     exp_data_row = str(evt["sid"]) + "," + str(evt["label"]) + "," + str(
-        evt["event"]) + "," + str(evt["duration"]) + "," + str(evt["volume"]) + "\n"
+        evt["event"]) + "," + str(evt["duration"]) + "," + str(evt["volume"]) + "," + str(evt["ts"]) + "\n"
     exp_data += exp_data_row
 
 result_name = root_data_folder + "/res_evt"

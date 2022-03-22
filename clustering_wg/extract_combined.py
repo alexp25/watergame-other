@@ -45,8 +45,9 @@ for row in df.iterrows():
                 "online": False,
                 "id": int(rowspec["id"]),
                 "uid": str(sensor_spec["id"]) + "_" + str(k + 1),
-                "label": label,
-                "data": []
+                "label": label,                
+                "data": [],
+                "ts": []
             })
         # print(row)
         sensor_list.append(sensor_spec)
@@ -179,6 +180,7 @@ for plot_index, sensor_spec in enumerate(sensor_list):
             if sensor_exp["id"] == sensor_spec["id"] and sensor_exp["label"] == label:
                 try:
                     sensor_exp["data"] = x[:, label_index]
+                    sensor_exp["ts"] = xlabels
                     data_row_max_size_1 = len(sensor_exp["data"])
                     if data_row_max_size_1 > data_row_max_size:
                         data_row_max_size = data_row_max_size_1
@@ -204,9 +206,7 @@ for plot_index, sensor_spec in enumerate(sensor_list):
 print(data_row_max_size)
 # quit()
 
-if save_file:
-    # print(sensor_list_exp)
-    # exp_data = "uid,lat,lng,"
+def process_fn(key):
     exp_data = "uid,label,x"
     for d in range(data_row_max_size):
         exp_data += "," + str(d)
@@ -215,19 +215,30 @@ if save_file:
         if sexp["online"]:
             label = sexp["label"]
             exp_data_row = sexp["uid"] + "," + label + ",x"
-            len_data = len(sexp["data"])
-            for d in sexp["data"]:
+            len_data = len(sexp[key])
+            for d in sexp[key]:
                 exp_data_row += "," + str(d)
             len_data_rem = data_row_max_size - len_data
             for d in range(len_data_rem):
                 exp_data_row += ",0"
             exp_data_row += "\n"
             exp_data += exp_data_row
+    return exp_data
 
-    result_name = root_data_folder + "/res"
+def save_result(name, exp_data):
+    result_name = root_data_folder + "/" + name
     if rolling_filter:
         result_name += "_rf"
     result_name += ".csv"
 
     with open(result_name, "w") as f:
         f.write(exp_data)
+        
+if save_file:
+    # print(sensor_list_exp)
+    # exp_data = "uid,lat,lng,"
+    exp_data = process_fn("data")
+    save_result("res", exp_data)
+    exp_data = process_fn("ts")
+    save_result("res_ts", exp_data)
+    

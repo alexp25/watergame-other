@@ -156,11 +156,8 @@ def plot_timeseries_multi_sub2(timeseries_arrays: List[List[Timeseries]], title,
         plt.subplot(n_sub * 100 + 11 + i)
         plt.grid()
         for ts in timeseries_array:
-            ndata = len(ts.x)
-            if xlabels is not None:
-                x = xlabels
-            else:
-                x = ts.x
+            ndata = len(ts.x)  
+            x = ts.x
             y = ts.y
 
             plt.plot(x, y, label=ts.label, color=ts.color)
@@ -185,6 +182,9 @@ def plot_timeseries_multi_sub2(timeseries_arrays: List[List[Timeseries]], title,
     # locs, labels = plt.xticks()
     # yint = x
     # plt.xticks(yint)
+    if xlabels:
+        positions = list(range(len(xlabels)))
+        plt.xticks([p*ndiv for p in positions], xlabels)
 
     fig = plt.gcf()
     if show:
