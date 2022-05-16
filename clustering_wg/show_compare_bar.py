@@ -9,15 +9,22 @@ from modules import utils
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
-
+import yaml
+import traceback
+config = yaml.safe_load(open("config.yml"))
 
 root_data_folder = "./data"
 # read the data from the csv file
 
 rolling_filter = False
 # rolling_filter = True
-data_files = ["res_all", "res_chiuveta_calda", "res_chiuveta_rece", "res_dus", "res_toaleta"]
-names = ["combined", "sink hot", "sink cold", "shower", "toilet"]
+
+fname_dict = config["fname_dict"]
+title_dict = config["title_dict"]
+
+data_files = ["res_" + key for key in fname_dict.keys()]
+names = [title_dict[key] for key in title_dict.keys()]
+
 plot_all_data = True
 # plot_all_data = False
 
@@ -45,25 +52,28 @@ cluster_specs_dict = {}
 for df in data_files:
     # df = loader.load_dataset_pd(root_data_folder + "/" + df)
     result_name = root_data_folder + "/" + df + ".csv"
-    x, header = loader.load_dataset(result_name)
-    x = x[start_index:, start_col:]
-    labels = np.shape(x)[0]
-    # print(labels)
-    for lb in range(labels):
-        if not lb in cluster_specs_dict:
-            cluster_specs = {
-                "label": str(lb),
-                "count": [x[lb,0]],
-                "disp": [x[lb,1]],
-                "duration": [x[lb,2]],
-                "volume": [x[lb,3]]
-            }
-            cluster_specs_dict[lb] = cluster_specs
-        else:
-            cluster_specs_dict[lb]["count"].append(x[lb,0])
-            cluster_specs_dict[lb]["disp"].append(x[lb,1])
-            cluster_specs_dict[lb]["duration"].append(x[lb,2])
-            cluster_specs_dict[lb]["volume"].append(x[lb,3])
+    try:
+        x, header = loader.load_dataset(result_name)
+        x = x[start_index:, start_col:]
+        labels = np.shape(x)[0]
+        # print(labels)
+        for lb in range(labels):
+            if not lb in cluster_specs_dict:
+                cluster_specs = {
+                    "label": str(lb),
+                    "count": [x[lb,0]],
+                    "disp": [x[lb,1]],
+                    "duration": [x[lb,2]],
+                    "volume": [x[lb,3]]
+                }
+                cluster_specs_dict[lb] = cluster_specs
+            else:
+                cluster_specs_dict[lb]["count"].append(x[lb,0])
+                cluster_specs_dict[lb]["disp"].append(x[lb,1])
+                cluster_specs_dict[lb]["duration"].append(x[lb,2])
+                cluster_specs_dict[lb]["volume"].append(x[lb,3])
+    except:
+        traceback.print_exc()
 
 # print(cluster_specs_dict)
 labels = list(cluster_specs_dict.keys())

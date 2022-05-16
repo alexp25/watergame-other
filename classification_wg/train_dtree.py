@@ -26,7 +26,7 @@ filename = config["filename"]
 modelname = config["modelname"]
 
 method = "dtree"
-method = "randomforest"
+# method = "randomforest"
 
 n_reps = 5
 use_saved_model = False

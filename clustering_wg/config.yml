@@ -1,0 +1,40 @@
+fname_dict: {
+    "all": ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"],
+    "chiuveta": ["chiuveta_rece", "chiuveta_calda"],
+    "chiuveta_calda": ["chiuveta_calda"],
+    "chiuveta_rece": ["chiuveta_rece"],
+    "dus": ["dus"],
+    "toaleta": ["toaleta"],
+    "temp": []
+}
+
+# category_dict: {
+#     "chiuveta": ["chiuveta_rece", "chiuveta_calda"],
+#     "chiuveta_calda": ["chiuveta_calda"],
+#     "chiuveta_rece": ["chiuveta_rece"],
+#     "dus": ["dus"],
+#     "toaleta": ["toaleta"]
+# }
+
+name_mapping: {
+    "dus": "shower",
+    "chiuveta_rece": "sink_cold",
+    "chiuveta_calda": "sink_hot",
+    "chiuveta_rece_baie": "sink_cold_bath",
+    "chiuveta_calda_baie": "sink_hot_batch",
+    "chiuveta_rece_bucatarie": "sink_cold_kitchen",
+    "chiuveta_calda_bucatarie": "sink_hot_kitchen",
+    "toaleta": "toilet",
+    "masina_spalat": "washing_machine",
+    "masina_spalat_vase": "dishwasher"
+}
+
+title_dict: {
+    "all": "combined",
+    "chiuveta": "sink",
+    "chiuveta_calda": "sink hot",
+    "chiuveta_rece": "sink cold",
+    "dus": "shower",
+    "toaleta": "toilet",
+    "temp": "custom filter"
+}

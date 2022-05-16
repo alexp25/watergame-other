@@ -22,7 +22,8 @@ sensor_list_exp = []
 
 for row in df.iterrows():
     rowspec = row[1]
-    if not np.isnan(rowspec["id"]):
+    # if not np.isnan(rowspec["id"]):
+    if len(rowspec["id"]) > 0:
         sensor_spec = {
             "id": int(rowspec["id"]),
             "loc": rowspec["apartament"] + " - " + rowspec["loc"],
@@ -87,12 +88,13 @@ for plot_index, sensor_spec in enumerate(sensor_list):
         (df['timestamp'] - ts_ref) < 0, df['timestamp']-(1*60*60), df['timestamp'])
     print(df["timestamp"])
 
- 
-    # df["timestamp"] = df["timestamp"].strftime(format_ts)
-    df["timestamp"] = df['timestamp'].apply(lambda x: pd.to_datetime(x, unit='s'))
+    # adjust for daylight saving
+    df["timestamp"] = df['timestamp'].apply(
+        lambda x: pd.to_datetime(x, unit='s'))
     print(df)
-    
+
     # quit()
-    filename = "watergame_sample_consumer_" + str(sensor_spec["id"]) + "_adapted.csv"
+    filename = "watergame_sample_consumer_" + \
+        str(sensor_spec["id"]) + "_adapted.csv"
     data_file = root_data_folder + "/" + filename
     loader.write_dataset_pd(df, data_file)

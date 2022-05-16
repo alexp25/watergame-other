@@ -7,6 +7,9 @@ from modules import clustering
 from modules import utils
 import numpy as np
 
+import yaml
+config = yaml.safe_load(open("config.yml"))
+
 root_data_folder = "./data"
 # read the data from the csv file
 
@@ -21,7 +24,8 @@ sensor_list_exp = []
 
 for row in df.iterrows():
     rowspec = row[1]
-    if not np.isnan(rowspec["id"]):
+    # if not np.isnan(rowspec["id"]):
+    if len(rowspec["id"]) > 0:
         sensor_spec = {
             "id": int(rowspec["id"]),
             "loc": rowspec["apartament"] + " - " + rowspec["loc"],
@@ -151,18 +155,7 @@ for plot_index, sensor_spec in enumerate(sensor_list):
     for d in range(nheader-1):
         header.append(str(d+1))
     header = sensor_spec["labels"]
-    mapping = {
-        "dus": "shower",
-        "chiuveta_rece": "sink_cold",
-        "chiuveta_calda": "sink_hot",
-        "chiuveta_rece_baie": "sink_cold_bath",
-        "chiuveta_calda_baie": "sink_hot_batch",
-        "chiuveta_rece_bucatarie": "sink_cold_kitchen",
-        "chiuveta_calda_bucatarie": "sink_hot_kitchen",
-        "toaleta": "toilet",
-        "masina_spalat": "washing_machine",
-        "masina_spalat_vase": "dishwasher"
-    }
+    mapping = config["name_mapping"]
     header = [mapping[head] for head in header]
 
     # time axis labels
@@ -184,7 +177,6 @@ for plot_index, sensor_spec in enumerate(sensor_list):
                     data_row_max_size_1 = len(sensor_exp["data"])
                     if data_row_max_size_1 > data_row_max_size:
                         data_row_max_size = data_row_max_size_1
-
                     sensor_exp["online"] = True
                 except:
                     print("exc " + str(sensor_exp["id"]))

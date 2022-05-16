@@ -9,6 +9,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import statistics
 
+import yaml
+config = yaml.safe_load(open("config.yml"))
+
 
 root_data_folder = "./data"
 # read the data from the csv file
@@ -35,52 +38,41 @@ end_col = 3
 fill_start = False
 
 savefig = True
-savefile = False
+savefile = True
 
 nc = 3
 
 eval_nc = True
 eval_nc = False
 
-x, header = loader.load_dataset(result_name)
-df = loader.load_dataset_pd(result_name)
+selection = "all"
 
+fname_dict = config["fname_dict"]
+title_dict = config["title_dict"]
 
-# fname = "dus"
-# fname = "toaleta"
-# fname = "all"
-# fname = "chiuveta_calda"
-# fname = "chiuveta_rece"
-fname = "temp"
-
-filter_labels = []
-# filter_labels = ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"]
-# filter_labels = ["chiuveta_rece", "chiuveta_calda"]
-# filter_labels = ["chiuveta_rece"]
-# filter_labels = ["chiuveta_calda"]
-# filter_labels = ["dus"]
-# filter_labels = ["toaleta"]
-# filter_labels = ["masina_spalat"]
-# filter_labels = ["masina_spalat_vase"]
-
+fname = selection
+filter_labels = fname_dict[selection]
 filter_uid = ["41364_1", "41364_2", "41364_3", "41364_4"]
+filter_uid = []
 
-x, header = loader.load_dataset(result_name)
+# x, header = loader.load_dataset(result_name)
 df = loader.load_dataset_pd(result_name)
-
 
 if len(filter_labels) > 0:
     boolean_series = df['label'].isin(filter_labels)
     df = df[boolean_series]
     # df["duration"] > 0
     df = df[df["volume"] >= 1]
-    df = df[df["duration"] < 10]
-    # df = df[df['label'] == filter_labels]
+    df = df[df["duration"] > 0]
+    df = df[df["duration"] < 10]  
 if len(filter_uid) > 0:
     boolean_series = df['uid'].isin(filter_uid)
     df = df[boolean_series]
 
+df.drop("timestamp", inplace=True, axis=1)
+
 print(df)
+
 x = df.to_numpy()
 x = x[start_index:, start_col:]
 
@@ -150,7 +142,7 @@ if savefile:
 
 # plot the results
 fig = clustering.plot_data_with_clusters(
-    X, kmeans, True, "duration [x60 s]", "volume [L]", False, (8, 6), 0)
+    X, kmeans, True, "duration [x60 s]", "volume [L]", False, (8, 6), 0, "Event Clustering - " + title_dict[selection])
 # add 4 squares delimiter
 # plt.axvline(x=np.min(X[:, 0] + (np.max(X[:, 0]) - np.min(X[:, 0])) / 2))
 # plt.axhline(y=0)

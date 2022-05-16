@@ -1,5 +1,5 @@
-filename: "res_evt_0"
-modelname: "res_evt_0"
+filename: "res_evt"
+modelname: "res_evt"
 root_data_folder: "data"
 root_model_folder: "models"
 # class_labels: ["sink_cold", "sink_hot", "toilet", "shower"]
@@ -47,7 +47,7 @@ train_percent: 80
 activation_fn: "softmax"
 loss_fn: "categorical_crossentropy"
 run_clean: False
-model_to_eval2: "./models/res_evt_0_dense_5_top.h5"
-model_to_eval: "./models/res_evt_0_1.skl"
-model_to_eval1: "./models/res_evt_0_rnn_3_top.h5"
+model_to_eval2: "./models/res_evt_dense_5_top.h5"
+model_to_eval: "./models/res_evt_1.skl"
+model_to_eval1: "./models/res_evt_rnn_3_top.h5"
 use_normalization: False

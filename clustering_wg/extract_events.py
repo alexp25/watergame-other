@@ -107,7 +107,7 @@ for i in range(sx[0]):
         # quit()
         events.append(new_event)
 
-exp_data = "uid,label,no,duration,volume\n"
+exp_data = "uid,label,no,duration,volume,timestamp\n"
 for evt in events:
     exp_data_row = str(evt["sid"]) + "," + str(evt["label"]) + "," + str(
         evt["event"]) + "," + str(evt["duration"]) + "," + str(evt["volume"]) + "," + str(evt["ts"]) + "\n"

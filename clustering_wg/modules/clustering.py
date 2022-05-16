@@ -16,6 +16,7 @@ FSIZE_LABEL_XS = 12
 OPACITY = 0.9
 OPACITY = 1
 
+
 def set_disp_ax(ax, title, xlabel, ylabel):
     if title:
         ax.set_title(title,  fontsize=FSIZE_TITLE)
@@ -40,7 +41,7 @@ def plot_data(X):
     plt.show()
 
 
-def plot_data_with_clusters(X, kmeans, show_centers=False, xlabel=None, ylabel=None, show=True, figsize=None, id=0):
+def plot_data_with_clusters(X, kmeans, show_centers=False, xlabel=None, ylabel=None, show=True, figsize=None, id=0, title="K-Means Clustering"):
     if not figsize:
         fig = plt.figure(id, figsize=(16, 8))
         # fig = plt.figure(id)
@@ -54,7 +55,6 @@ def plot_data_with_clusters(X, kmeans, show_centers=False, xlabel=None, ylabel=N
         plt.scatter(kmeans.cluster_centers_[:, 0], kmeans.cluster_centers_[
                     :, 1], color="orange", s=(200, 200), label="centroids", marker="o")
 
-    title = 'K-Means Clustering'
     plt.title(title)
     if xlabel:
         plt.xlabel(xlabel)
@@ -290,6 +290,7 @@ def clustering_birch(X, k, same_order):
 
     return X, model, centroids, average_silhouette_score, wcss, average_euclid_dist_mean
 
+
 def clustering_kmeans_get_labels(X, k, same_order):
     # kmeans = KMeans(n_clusters=k, init="random")
     # X_input = np.reshape(X, (-1, 1))
@@ -384,6 +385,3 @@ def clustering_kmeans(X, k, same_order):
     # sum_euclid_dist = 0
 
     return X, kmeans, centroids, average_silhouette_score, wcss, average_euclid_dist_mean, sum_euclid_dist_each
-
-
-

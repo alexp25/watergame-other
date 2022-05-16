@@ -6,7 +6,8 @@ from modules import loader, graph
 from modules import clustering
 from modules import utils
 import numpy as np
-
+import yaml
+config = yaml.safe_load(open("config.yml"))
 
 def run_clustering(x, nc, xheader, xlabels=None):
     if nc is None:
@@ -90,9 +91,13 @@ start_col = 3
 end_col = None
 fill_start = False
 
-filter_labels = []
-filter_labels = ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"]
-# filter_labels = ["toaleta"]
+selection = "all"
+
+fname_dict = config["fname_dict"]
+title_dict = config["title_dict"]
+
+fname = selection
+filter_labels = fname_dict[selection]
 
 x, header = loader.load_dataset(result_name)
 

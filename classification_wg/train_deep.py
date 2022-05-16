@@ -42,7 +42,7 @@ if n_reps > 1:
 else:
     save_best_model = False
 
-use_rnn = True
+use_rnn = False
 use_scaler = config["use_normalization"]
 
 prep = Preprocessing()

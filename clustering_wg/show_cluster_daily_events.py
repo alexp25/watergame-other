@@ -2,12 +2,15 @@
 
 # import our modules
 from fileinput import filename
+from unicodedata import category
 from modules import loader, graph
 from modules import clustering
 from modules import utils
 import numpy as np
 import statistics
 
+import yaml
+config = yaml.safe_load(open("config.yml"))
 
 def run_clustering(x, nc, xheader, xlabels=None):
     if nc is None:
@@ -91,11 +94,16 @@ end_col = None
 fill_start = False
 n_days = 14
 
-filter_labels = []
-# filter_labels = ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"]
-# filter_labels = ["toaleta"]
+selection = "all"
+
+fname_dict = config["fname_dict"]
+title_dict = config["title_dict"]
+
+fname = selection
+filter_labels = fname_dict[selection]
+
 filter_uid = ["41364_1", "41364_2", "41364_3", "41364_4"]
-# filter_uid = []
+filter_uid = []
 
 x, header = loader.load_dataset(result_name)
 df = loader.load_dataset_pd(result_name)
@@ -130,6 +138,7 @@ header = []
 for d in range(sx[0]):
     header.append(x[d, 0] + " - " + x[d, 1])
 print(header)
+loc_header = header
 
 if fill_start:
     x = x[start_index:, :]
@@ -237,7 +246,9 @@ for consumer in range(sx[1]):
         # graph.save_figure(fig, result_name, 200)
 
 print(x_consumer_average_vect)
-header = ["chiuveta_rece", "chiuveta_calda", "toaleta", "dus"]
+# header = [config["name_mapping"][loc] for loc in filter_labels]
+header = loc_header
+
 x_consumer_average_vect = np.array(x_consumer_average_vect)
 x_consumer_average_vect = np.transpose(x_consumer_average_vect)
 
@@ -252,6 +263,6 @@ tss = utils.create_timeseries(x_consumer_average_vect, header, None, datax)
 figsize = (12, 6)
 figsize = (8, 6)
 fig = graph.plot_timeseries_multi_sub2(
-    [tss], ["Daily consumption events"], "x [time of day]", [xlabel], figsize, 24, None, datax_labels, True, 0)
+    [tss], ["Daily consumption events"], "time of day [h]", [xlabel], figsize, 24, None, datax_labels, True, 0)
 result_name = "./figs/consumer_patterns_day_" + str(nc) + "c"
 graph.save_figure(fig, result_name, 200)
