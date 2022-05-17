@@ -3,51 +3,32 @@ modelname: "res_evt"
 root_data_folder: "data"
 root_model_folder: "models"
 # class_labels: ["sink_cold", "sink_hot", "toilet", "shower"]
-class_labels: ["sink_cold", "sink_hot", "toilet", "shower"]
-filter_labels: ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"]
-apply_balancing: False
-filter_labels1: [
-  "toaleta",
-  "chiuveta_rece_baie",
-  "chiuveta_calda_baie",
-  "chiuveta_rece_bucatarie",
-  "chiuveta_calda_bucatarie",
-  # "dus"
-]
+# class_labels: ["sink_cold", "sink_hot", "toilet", "shower"]
+class_labels: ["toilet", "sink"]
+# filter_labels: ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"]
+# filter_labels: ["toaleta","chiuveta_rece_baie","chiuveta_calda_baie","chiuveta_rece_bucatarie","chiuveta_calda_bucatarie","dus"]
+filter_labels: ["toaleta", "chiuveta_rece", "chiuveta_calda"]
+apply_balancing: True
+
 map_labels: {
+  "chiuveta": 10,
   "chiuveta_rece": 1,
-  "chiuveta_calda": 2,
+  "chiuveta_calda": 1,
+  "chiuveta_rece_baie": 11,
+  "chiuveta_calda_baie": 12,
+  "chiuveta_rece_bucatarie": 13,
+  "chiuveta_calda_bucatarie": 14,
   "toaleta": 3,
   "dus": 4,
   "masina_spalat": 5,
   "masina_spalat_vase": 6
 }
-map_labels1: {
-  "chiuveta_rece_baie": 1,
-  "chiuveta_calda_baie": 2,
-  "chiuveta_rece_bucatarie": 3,
-  "chiuveta_calda_bucatarie": 4,
-  "toaleta": 5,
-  "dus": 6,
-  "masina_spalat": 7,
-  "masina_spalat_vase": 8
-}
-map_labels2: {
-  "chiuveta_rece_baie": 1,
-  "chiuveta_calda_baie": 2,
-  "chiuveta_rece_bucatarie": 1,
-  "chiuveta_calda_bucatarie": 2,
-  "toaleta": 5,
-  "dus": 6,
-  "masina_spalat": 7,
-  "masina_spalat_vase": 8
-}
-load_from_container: True
+
 train_percent: 80
 activation_fn: "softmax"
 loss_fn: "categorical_crossentropy"
 run_clean: False
-model_to_eval2: "./models/res_evt_dense_5_top.h5"
+# model_to_eval: "./models/res_evt_dense_3_top.h5"
+# model_to_eval: "./models/res_evt_rnn_5_top.h5"
 model_to_eval: "./models/res_evt_1.skl"
-model_to_eval1: "./models/res_evt_rnn_3_top.h5"
-use_normalization: False
+use_normalization: True

@@ -18,7 +18,7 @@ with open("config.yml", "r") as f:
     config = yaml.load(f)
 
 labels = ["DT", "RF", "Dense", "RNN"]
-limits = [50, 80]
+limits = [85, 100]
 files_array = [["eval_dtree_train", "eval_randomforest_train",
                 "eval_dense_train", "eval_rnn_train"], ["eval_dtree_test", "eval_randomforest_test",
                                                         "eval_dense_test", "eval_rnn_test"]]

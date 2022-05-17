@@ -73,7 +73,7 @@ extract_inst_flow = True
 save_file = True
 
 rolling_filter = True
-rolling_filter = False
+# rolling_filter = False
 
 
 start_index = 1
@@ -136,14 +136,12 @@ for plot_index, sensor_spec in enumerate(sensor_list):
     print(sx)
 
     if rolling_filter:
-        kernel_size = int(0.1 * sx[0])
+        kernel_size = int(0.01 * sx[0])
         kernel = np.ones(kernel_size) / kernel_size
         for dim in range(sx[1]):
             x[:, dim] = np.convolve(x[:, dim], kernel, mode='same')
 
     if remove_outlier:
-        outlier = -1
-        outliers = []
         x = clustering.remove_outliers(x)
 
     sx = np.shape(x)
@@ -212,7 +210,7 @@ def process_fn(key):
                 exp_data_row += "," + str(d)
             len_data_rem = data_row_max_size - len_data
             for d in range(len_data_rem):
-                exp_data_row += ",0"
+                exp_data_row += ",-1"
             exp_data_row += "\n"
             exp_data += exp_data_row
     return exp_data

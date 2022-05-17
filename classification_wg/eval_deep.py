@@ -15,6 +15,7 @@ import yaml
 from modules.preprocessing import Preprocessing
 from modules import generator
 from modules import preprocessing
+import apply_filters
 
 # import tensorflow.compat.v1 as tf
 # tf.disable_v2_behavior()
@@ -40,7 +41,7 @@ if n_reps > 1:
 else:
     save_best_model = False
 
-use_rnn = False
+use_rnn = True
 
 prep = Preprocessing()
 
@@ -50,12 +51,10 @@ df = loader.load_dataset_pd(data_file)
 filter_labels = []
 filter_labels = config["filter_labels"]
 
-if len(filter_labels) > 0:
-    boolean_series = df['label'].isin(filter_labels)
-    df = df[boolean_series]
-    # df["duration"] > 0
-    df = df[df["volume"] >= 1]
-    # df = df[df["duration"] < 10]
+df = apply_filters.apply_filter_labels(df, filter_labels) 
+
+if config["apply_balancing"]:
+    df = apply_filters.apply_balancing(df, filter_labels)
 
 df = loader.format_data(df, config["map_labels"])
 print(df)
