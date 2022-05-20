@@ -1,12 +1,9 @@
 
 
 # import our modules
-from fileinput import filename
-from unicodedata import category
 from modules import loader, graph
 from modules import clustering
 from modules import utils
-from modules import preprocessing
 import numpy as np
 import statistics
 
@@ -69,12 +66,13 @@ root_data_folder = "./data"
 # read the data from the csv file
 
 rolling_filter = False
-rolling_filter = True
+# rolling_filter = True
 
-# show_actual_classes = True
+show_actual_classes = True
 show_actual_classes = False
 
 process_daily_batches = False
+# process_daily_batches = True
 
 res_name = "res"
 
@@ -109,7 +107,7 @@ fname = selection
 filter_labels = fname_dict[selection]
 
 filter_uid = ["41364_1", "41364_2", "41364_3", "41364_4"]
-filter_uid = []
+# filter_uid = []
 
 x, header = loader.load_dataset(result_name)
 df = loader.load_dataset_pd(result_name)
@@ -319,7 +317,7 @@ if process_daily_batches:
     figsize = (12, 6)
     figsize = (8, 6)
     fig = graph.plot_timeseries_multi_sub2(
-        [tss], ["Daily consumption events"], "time of day [h]", [xlabel], figsize, 24, None, datax_labels, True, 0)
+        [tss], ["Daily consumption patterns"], "time of day [h]", [xlabel], figsize, 24, None, datax_labels, True, 0)
     result_name = "./figs/consumer_patterns_day_all_" + str(nc) + "c"
     if rolling_filter:
         result_name += "_rf"
@@ -346,6 +344,6 @@ else:
     figsize = (12, 6)
     figsize = (8, 6)
     fig = graph.plot_timeseries_multi_sub2(
-        [tss], ["Daily consumption events"], "time of day [h]", [xlabel], figsize, 24, None, datax_labels, True, 0)
+        [tss], ["Daily consumption patterns"], "time of day [h]", [xlabel], figsize, 24, None, datax_labels, True, 0)
     result_name = "./figs/consumer_patterns_day_" + str(nc) + "c"
     graph.save_figure(fig, result_name, 200)

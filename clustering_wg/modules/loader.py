@@ -121,5 +121,11 @@ def save_as_csv_1d(filename, np1d):
     with open(filename, "w") as f:
         f.write(data)
 
+def format_data(df):
+    # format the data, map classes to numbers
+    d = {'chiuveta_rece': 1, 'chiuveta_calda': 1, "toaleta": 2, "dus": 3, "masina_spalat": 5, "masina_spalat_vase": 6}
+    df['label'] = df['label'].map(d)
+    return df
+
 if __name__ == "__main__":
     clean("./data/models/crt")

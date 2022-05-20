@@ -61,6 +61,8 @@ if config["apply_balancing"]:
 df = loader.format_data(df, config["map_labels"])
 print(df)
 
+quit()
+
 # shuffle dataset rows
 df = df.sample(frac=1, random_state=42).reset_index(drop=True)
 # this makes sure, that you keep your random choice always replicatable

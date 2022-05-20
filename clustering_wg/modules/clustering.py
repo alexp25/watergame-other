@@ -3,11 +3,10 @@ import numpy as np
 from sklearn.cluster import KMeans, Birch
 from sklearn.metrics import silhouette_samples, silhouette_score
 from sklearn.neighbors import LocalOutlierFactor
-from sklearn.metrics import mean_squared_error
-from scipy.spatial.distance import cdist
 import matplotlib.cm as cm
-import math
 from modules import graph
+from matplotlib.ticker import MaxNLocator
+
 
 FSIZE_TITLE = 16
 FSIZE_LABEL = 14
@@ -61,6 +60,10 @@ def plot_data_with_clusters(X, kmeans, show_centers=False, xlabel=None, ylabel=N
     if ylabel:
         plt.ylabel(ylabel)
     plt.legend(loc='upper left')
+
+    ax = plt.gca()
+    # ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ax.xaxis.set_major_locator(MaxNLocator(integer=True))
 
     set_disp(title, xlabel, ylabel)
     plt.xticks()

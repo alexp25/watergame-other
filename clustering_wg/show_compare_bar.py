@@ -25,8 +25,8 @@ title_dict = config["title_dict"]
 data_files = ["res_" + key for key in fname_dict.keys()]
 names = [title_dict[key] for key in title_dict.keys()]
 
-plot_all_data = True
-# plot_all_data = False
+# plot_all_data = True
+plot_all_data = False
 
 rolling_filter = True
 rolling_filter = False
@@ -103,13 +103,25 @@ specs = []
 # extract spec
 for k in cluster_specs_dict.keys():
     specs.append(cluster_specs_dict[k][key])
+
 specs_mat = np.array(specs)
 specs_mat = np.transpose(specs_mat)
 spect_mat = list(specs_mat)
-print(specs_mat)
+
+m = np.mean(specs_mat, axis=1)
+
+for i, name in enumerate(names):
+    try:
+        print(name + ": " + str(m[i]))
+    except:
+        pass
+# quit()
+print(m)
+
+# print(np.transpose(specs_mat))
 # quit()
 fig, _ = graph.plot_barchart_multi_core_raw(specs_mat, color_scheme, names, "Cluster", "Dispersion",
-                                          "Cluster distribution", None, None, True, None, 0, None)
+                                          "Within-cluster dispersion", None, None, True, None, 0, None)
 # fig, _ = graph.plot_barchart_multi_core_raw([[1,2,3],[4,5,6],[2,3,4],[5,4,3]], color_scheme, names, "Cluster", "Value",
 #                                           "Cluster distribution", labels, None, True, None, 0, None)
 

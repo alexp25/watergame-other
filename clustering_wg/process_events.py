@@ -2,6 +2,8 @@
 
 # import our modules
 from fileinput import filename
+
+from sklearn import cluster
 from modules import loader, graph
 from modules import clustering
 from modules import utils
@@ -13,13 +15,20 @@ import yaml
 config = yaml.safe_load(open("config.yml"))
 
 
+extract_inst_flow = False
+# extract_inst_flow = True
+
 root_data_folder = "./data"
 # read the data from the csv file
+
+res_name = "res_evt"
+if not extract_inst_flow:
+    res_name = "res_evt_vol"
 
 rolling_filter = False
 # rolling_filter = True
 
-result_name = root_data_folder + "/res_evt"
+result_name = root_data_folder + "/" + res_name
 if rolling_filter:
     result_name += "_rf"
 result_name += ".csv"
@@ -46,6 +55,11 @@ eval_nc = True
 eval_nc = False
 
 selection = "all"
+# selection = "chiuveta"
+# selection = "chiuveta_calda"
+# selection = "chiuveta_rece"
+# selection = "dus"
+# selection = "toaleta"
 
 fname_dict = config["fname_dict"]
 title_dict = config["title_dict"]
@@ -64,14 +78,18 @@ if len(filter_labels) > 0:
     # df["duration"] > 0
     df = df[df["volume"] >= 1]
     df = df[df["duration"] > 0]
-    df = df[df["duration"] < 10]  
+    # df = df[df["duration"] < 10]
 if len(filter_uid) > 0:
     boolean_series = df['uid'].isin(filter_uid)
     df = df[boolean_series]
 
 df.drop("timestamp", inplace=True, axis=1)
 
-print(df)
+df = loader.format_data(df)
+labels = list(df["label"]-1)
+
+with open("classes.txt", "w") as f:
+    f.write("[" + ",".join([str(label) for label in labels]) + "]")
 
 x = df.to_numpy()
 x = x[start_index:, start_col:]
@@ -95,6 +113,8 @@ print(np.shape(x))
 X, kmeans, centroids, average_silhouette_score, wcss, average_euclid_dist_mean, sum_euclid_dist_each = clustering.clustering_kmeans(
     x, nc, True)
 
+print("silhouette score: ", average_silhouette_score)
+
 print(centroids)
 # sort by "duration"
 sort_order = centroids[:, 0].argsort()
@@ -102,10 +122,14 @@ print(sort_order)
 centroids = centroids[sort_order]
 print(centroids)
 
-print(kmeans.labels_)
+with open("assignments.txt", "w") as f:
+    f.write("[" + ",".join([str(label) for label in kmeans.labels_]) + "]")
+
+# quit()
 unique_labels = list(set(kmeans.labels_))
 print(unique_labels)
 # print(sort_order)
+
 # unique_labels = [unique_labels[i] for i in sort_order]
 # print(unique_labels)
 
@@ -126,7 +150,9 @@ for i, label in enumerate(unique_labels):
         "centroid": list(centroids[dict_swap[i]])
     }
     cluster_data.append(cd)
-print(cluster_data)
+
+for cd in cluster_data:
+    print(cd)
 # quit()
 # format results
 res_data = "label,count,disp,duration,volume\n"
@@ -138,7 +164,6 @@ if savefile:
     result_name = root_data_folder + "/res_" + fname + ".csv"
     with open(result_name, "w") as f:
         f.write(res_data)
-# quit()
 
 # plot the results
 fig = clustering.plot_data_with_clusters(

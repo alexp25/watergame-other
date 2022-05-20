@@ -40,16 +40,16 @@ for row in df.iterrows():
                 label = rowspec[dl]
                 if extract_locations:
                     if label in ['chiuveta_calda', 'chiuveta_rece']:
-                        label = label + '_' + rowspec["tip_loc"]  
+                        label = label + '_' + rowspec["tip_loc"]
                 sensor_spec["labels"].append(label)
                 pass
-            
-        for k, label in enumerate(sensor_spec["labels"]):                      
+
+        for k, label in enumerate(sensor_spec["labels"]):
             sensor_list_exp.append({
                 "online": False,
                 "id": int(rowspec["id"]),
                 "uid": str(sensor_spec["id"]) + "_" + str(k + 1),
-                "label": label,                
+                "label": label,
                 "data": [],
                 "ts": []
             })
@@ -68,17 +68,20 @@ remove_outlier = False
 norm = False
 
 extract_inst_flow = False
-extract_inst_flow = True
+# extract_inst_flow = True
 
+# save_file = False
 save_file = True
 
-rolling_filter = True
-# rolling_filter = False
+# rolling_filter = True
+rolling_filter = False
 
 
 start_index = 1
 # end_index = 100
+end_index = 20160  # 2 weeks in minutes
 end_index = None
+
 start_col = 3
 end_col = None
 fill_start = False
@@ -136,7 +139,7 @@ for plot_index, sensor_spec in enumerate(sensor_list):
     print(sx)
 
     if rolling_filter:
-        kernel_size = int(0.01 * sx[0])
+        kernel_size = int(0.1 * sx[0])
         kernel = np.ones(kernel_size) / kernel_size
         for dim in range(sx[1]):
             x[:, dim] = np.convolve(x[:, dim], kernel, mode='same')
@@ -196,6 +199,7 @@ for plot_index, sensor_spec in enumerate(sensor_list):
 print(data_row_max_size)
 # quit()
 
+
 def process_fn(key):
     exp_data = "uid,label,x"
     for d in range(data_row_max_size):
@@ -213,7 +217,13 @@ def process_fn(key):
                 exp_data_row += ",-1"
             exp_data_row += "\n"
             exp_data += exp_data_row
+            # extract metrics
+            # L/h, but sampling each minute
+            total_volume = sum(sexp["data"])/60
+            print("sensor " + sexp["uid"] + "_" + label +
+                  " total volume: " + str(total_volume))
     return exp_data
+
 
 def save_result(name, exp_data):
     result_name = root_data_folder + "/" + name
@@ -223,12 +233,15 @@ def save_result(name, exp_data):
 
     with open(result_name, "w") as f:
         f.write(exp_data)
-        
+
+
+exp_data = process_fn("data")
+
 if save_file:
     # print(sensor_list_exp)
     # exp_data = "uid,lat,lng,"
+    result_name = "res" if extract_inst_flow else "res_vol"
     exp_data = process_fn("data")
-    save_result("res", exp_data)
+    save_result(result_name, exp_data)
     exp_data = process_fn("ts")
-    save_result("res_ts", exp_data)
-    
+    save_result(result_name + "_ts", exp_data)

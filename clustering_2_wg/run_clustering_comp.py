@@ -6,15 +6,8 @@ from modules import clustering
 from modules import utils
 from modules import clustering_eval, clustering_eval_2
 from modules import preprocessing
-from matplotlib import pyplot as plt
 import numpy as np
-import pandas as pd
-import time
-import os
-import yaml
 from typing import List
-import math
-import sys
 import apply_filters
 
 
@@ -49,7 +42,7 @@ remove_outlier = False
 norm2 = True
 norm2 = False
 
-rolling_filter = True
+rolling_filter = False
 
 for option in options:
 

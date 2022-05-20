@@ -7,3 +7,9 @@
 2. extract_events.py
 3. process_events.py
 
+# flow 3 (daily patterns)
+1. show_cluster_daily_events.py > process_daily_batches = True
+
+# flow 4 (timeframe patterns)
+1. extract_combined.py > plot_all_data = True
+end_index = 20160  # 2 weeks in minutes

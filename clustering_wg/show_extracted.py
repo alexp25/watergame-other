@@ -9,6 +9,7 @@ import numpy as np
 import yaml
 config = yaml.safe_load(open("config.yml"))
 
+
 def run_clustering(x, nc, xheader, xlabels=None):
     if nc is None:
         # use silhouette score
@@ -79,10 +80,7 @@ if rolling_filter:
 result_name += ".csv"
 
 plot_all_data = True
-# plot_all_data = False
-
-rolling_filter = True
-rolling_filter = False
+plot_all_data = False
 
 start_index = 1
 # end_index = 100
@@ -103,10 +101,15 @@ x, header = loader.load_dataset(result_name)
 
 df = loader.load_dataset_pd(result_name)
 
+filter_uid = ["33383_1", "33383_2", "33383_3", "33383_4", "33383_5"]
+filter_uid = []
+
 if len(filter_labels) > 0:
     boolean_series = df['label'].isin(filter_labels)
     df = df[boolean_series]
-    # df = df[df['label'] == filter_labels]
+    if len(filter_uid) > 0:
+        boolean_series = df['uid'].isin(filter_uid)
+        df = df[boolean_series]
 
 x = df.to_numpy()
 print(x)
@@ -177,6 +180,7 @@ if plot_all_data:
     result_name = "./figs/consumer_data"
     graph.save_figure(fig, result_name, 200)
 
+
 xlabels_disp = xlabels
 # cluster labels
 xheader = ["c" + str(i+1) for i in range(sx[1])]
@@ -202,4 +206,3 @@ fig = graph.plot_timeseries_multi_sub2(
 result_name = "./figs/consumer_patterns_" + str(nc) + "c"
 
 graph.save_figure(fig, result_name, 200)
-

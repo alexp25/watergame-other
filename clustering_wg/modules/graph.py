@@ -564,8 +564,8 @@ def plot_barchart_multi_core_raw(data, colors, labels, xlabel, ylabel, title, xl
         low = limits[0]
         high = limits[1]
     else:
-        high += kscale * high
-        low -= kscale * low
+        high += kscale * abs(high)
+        low -= kscale * abs(low)
 
     ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     ax.xaxis.set_major_locator(MaxNLocator(integer=True))

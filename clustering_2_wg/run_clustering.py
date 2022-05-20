@@ -5,18 +5,7 @@ from modules import loader, graph
 from modules import clustering
 from modules import utils
 from modules import preprocessing
-from matplotlib import pyplot as plt
-
-
 import numpy as np
-import pandas as pd
-import time
-import os
-import yaml
-from typing import List
-import math
-import sys
-
 
 root_data_folder = "./data"
 # read the data from the csv file
@@ -91,7 +80,7 @@ remove_outlier = False
 norm2 = True
 norm2 = False
 
-rolling_filter = False
+rolling_filter = True
 
 for option in options:
     print(option)

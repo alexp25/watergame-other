@@ -8,10 +8,16 @@ from modules import utils
 import numpy as np
 
 
+extract_inst_flow = False
+# extract_inst_flow = True
+
 root_data_folder = "./data"
 # read the data from the csv file
 
+
 res_name = "res"
+if not extract_inst_flow:
+    res_name = "res_vol"
 
 result_name = root_data_folder + "/" + res_name
 result_name += ".csv"
@@ -21,6 +27,7 @@ result_ts_name += ".csv"
 
 plot_all_data = True
 # plot_all_data = False
+
 
 start_index = 1
 # end_index = 100
@@ -114,6 +121,8 @@ for evt in events:
     exp_data += exp_data_row
 
 result_name = root_data_folder + "/res_evt"
+if not extract_inst_flow:
+    result_name += "_vol"
 result_name += ".csv"
 
 with open(result_name, "w") as f:
