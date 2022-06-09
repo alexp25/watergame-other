@@ -4,12 +4,13 @@ root_data_folder: "data"
 root_model_folder: "models"
 # class_labels: ["sink_cold", "sink_hot", "toilet", "shower"]
 # class_labels: ["sink_cold", "sink_hot", "toilet", "shower"]
-class_labels: ["toilet", "sink"]
+class_labels: ["toilet", "sink", "shower"]
 # filter_labels: ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"]
+filter_labels: ["toaleta", "chiuveta", "dus"]
 # filter_labels: ["toaleta","chiuveta_rece_baie","chiuveta_calda_baie","chiuveta_rece_bucatarie","chiuveta_calda_bucatarie","dus"]
-filter_labels: ["toaleta", "chiuveta_rece", "chiuveta_calda"]
-apply_balancing: True
-
+# filter_labels: ["toaleta", "chiuveta_rece", "chiuveta_calda"]
+apply_balancing: False
+# to combine classes, use the same number, e.g. chiuveta_rece = chiuveta_calda = 1 => chiuveta
 map_labels: {
   "chiuveta": 10,
   "chiuveta_rece": 1,
@@ -28,7 +29,8 @@ train_percent: 80
 activation_fn: "softmax"
 loss_fn: "categorical_crossentropy"
 run_clean: False
-# model_to_eval: "./models/res_evt_dense_3_top.h5"
-# model_to_eval: "./models/res_evt_rnn_5_top.h5"
-model_to_eval: "./models/res_evt_1.skl"
-use_normalization: True
+# model_to_eval: "./models/res_evt_dense_1_top.h5"
+# model_to_eval: "./models/res_evt_rnn_3_top.h5"
+# model_to_eval: "./models/res_evt_dtree_1.skl"
+model_to_eval: "./models/res_evt_randomforest_1.skl"
+use_normalization: False

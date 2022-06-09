@@ -6,14 +6,13 @@ from modules import loader, graph
 from modules import clustering
 from modules import utils
 import numpy as np
+import yaml
+config = yaml.safe_load(open("config.yml"))
 
-
-extract_inst_flow = False
-# extract_inst_flow = True
+extract_inst_flow = config["extract_inst_flow"]
 
 root_data_folder = "./data"
 # read the data from the csv file
-
 
 res_name = "res"
 if not extract_inst_flow:
@@ -25,16 +24,7 @@ result_name += ".csv"
 result_ts_name = root_data_folder + "/" + res_name + "_ts"
 result_ts_name += ".csv"
 
-plot_all_data = True
-# plot_all_data = False
-
-
-start_index = 1
-# end_index = 100
-end_index = None
 start_col = 3
-end_col = None
-fill_start = False
 
 x, header = loader.load_dataset(result_name)
 df = loader.load_dataset_pd(result_name)

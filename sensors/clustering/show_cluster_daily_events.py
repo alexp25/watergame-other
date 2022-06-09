@@ -48,8 +48,6 @@ def run_clustering(x, nc, xheader, xlabels=None):
     print("silhouette score: ", silhouette_score)
     xc = np.transpose(centroids)
 
-    
-
     if xlabels is not None:
         xlabels = np.array(xlabels)
         xlabels = np.transpose(xlabels)
@@ -98,15 +96,17 @@ fill_start = False
 n_days = 14
 hours_roll = 14
 
-selection = "all"
+selection = "all_combined"
 
 fname_dict = config["fname_dict"]
 title_dict = config["title_dict"]
 
+map_dict = {'chiuveta_rece': 1, 'chiuveta_calda': 2, "chiuveta": 1, "toaleta": 3, "dus": 4, "masina_spalat": 5, "masina_spalat_vase": 6}
+
 fname = selection
 filter_labels = fname_dict[selection]
 
-filter_uid = ["41364_1", "41364_2", "41364_3", "41364_4"]
+filter_uid = ["41364_1", "41364_2", "41364_3"]
 # filter_uid = []
 
 x, header = loader.load_dataset(result_name)
@@ -116,6 +116,7 @@ t, _ = loader.load_dataset(result_ts_name)
 df_ts = loader.load_dataset_pd(result_ts_name)
 
 x_ts = df_ts.to_numpy()
+
 
 print(x_ts)
 
@@ -160,6 +161,8 @@ if end_col is not None:
     x = x[:, :end_col]
     x_ts = x_ts[:, :end_col]
 
+
+
 for consumer in range(sx[0]):
     stdev = statistics.stdev(x[:, consumer])
     print("stdev ", consumer, " = ", stdev)
@@ -194,7 +197,6 @@ x_consumer_input_combined = None
 x_consumer_average_groups = {}
 
 actual_labels = []
-d = {'chiuveta_rece': 1, 'chiuveta_calda': 2, "toaleta": 3, "dus": 4, "masina_spalat": 5, "masina_spalat_vase": 6}
 
 # for day in range(n_days):
 for consumer in range(sx[1]):
@@ -202,7 +204,7 @@ for consumer in range(sx[1]):
     for days in x_split:
         print(np.shape(days))
         x_consumer.append(days[:, consumer])
-        actual_labels.append(d[header_groups[consumer]])
+        actual_labels.append(map_dict[header_groups[consumer]])
     x_consumer = np.transpose(np.array(x_consumer))
     print(x_consumer)
     sx = np.shape(x_consumer)
@@ -244,8 +246,8 @@ for consumer in range(sx[1]):
             x_consumer_average]
     else:
         x_consumer_average_groups[header_groups[consumer]].append(
-            x_consumer_average)   
-    
+            x_consumer_average)
+
     if nc == 1:
         # average rows
         x_consumer_average_vect.append(x_consumer_average)
@@ -275,12 +277,12 @@ if process_daily_batches:
     print("actual labels: ", actual_labels)
     # quit()
     if show_actual_classes:
-        x_consumer_input_combined = []    
+        x_consumer_input_combined = []
         for g in x_consumer_average_groups.keys():
             a = np.average(np.array(x_consumer_average_groups[g]), axis=0)
             print(a)
-            x_consumer_input_combined.append(a)              
-            
+            x_consumer_input_combined.append(a)
+
         xc = np.array(x_consumer_input_combined)
         xplot = np.transpose(xc)
         xplot = np.roll(xplot, hours_roll*60, axis=0)
@@ -289,7 +291,9 @@ if process_daily_batches:
             xlabels = np.transpose(xlabels)
         print(xlabels)
         xlabels = None
-        header = [config["name_mapping"][key] for key in list(x_consumer_average_groups.keys())]
+        header = [config["name_mapping"][key]
+                  for key in list(x_consumer_average_groups.keys())]
+        print(header)
         print(np.shape(xplot))
         tss = utils.create_timeseries(xplot, header, xlabels)
     else:
@@ -323,6 +327,8 @@ if process_daily_batches:
         result_name += "_rf"
     if show_actual_classes:
         result_name += "_actual"
+    if len(filter_uid) > 0:
+        result_name += "_f"
     graph.save_figure(fig, result_name, 200)
 else:
     print(x_consumer_average_vect)
@@ -340,6 +346,10 @@ else:
     datax_labels = [str(h//60) for h in list(range(0, 24*60))]
     datax_labels = ["0"+str(h % 24) if h < 10 else str(h % 24)
                     for h in list(range(0, 24))]  # original time in UTC (data rolled)
+
+    header = [config["name_mapping"][key]
+                for key in list(x_consumer_average_groups.keys())]
+    print(header)
     tss = utils.create_timeseries(x_consumer_average_vect, header, None, datax)
     figsize = (12, 6)
     figsize = (8, 6)

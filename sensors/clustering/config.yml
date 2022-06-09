@@ -1,5 +1,6 @@
 fname_dict: {
     "all": ["toaleta", "chiuveta_rece", "chiuveta_calda", "dus"],
+    "all_combined": ["chiuveta", "toaleta", "dus"],
     "chiuveta": ["chiuveta_rece", "chiuveta_calda"],
     "chiuveta_calda": ["chiuveta_calda"],
     "chiuveta_rece": ["chiuveta_rece"],
@@ -7,6 +8,7 @@ fname_dict: {
     "toaleta": ["toaleta"],
     "temp": []
 }
+
 
 # category_dict: {
 #     "chiuveta": ["chiuveta_rece", "chiuveta_calda"],
@@ -18,6 +20,7 @@ fname_dict: {
 
 name_mapping: {
     "dus": "shower",
+    "chiuveta": "sink",
     "chiuveta_rece": "sink_cold",
     "chiuveta_calda": "sink_hot",
     "chiuveta_rece_baie": "sink_cold_bath",
@@ -38,3 +41,6 @@ title_dict: {
     "toaleta": "toilet",
     "temp": "custom filter"
 }
+
+combined_sink_data: True
+extract_inst_flow: True

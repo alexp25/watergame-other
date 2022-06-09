@@ -27,6 +27,7 @@ modelname = config["modelname"]
 
 method = "dtree"
 method = "randomforest"
+method = "svm"
 
 n_reps = 5
 use_saved_model = False
@@ -61,6 +62,7 @@ if config["apply_balancing"]:
 
 df = loader.format_data(df, config["map_labels"])
 print(df)
+
 
 # shuffle dataset rows
 df = df.sample(frac=1, random_state=42).reset_index(drop=True)
@@ -109,6 +111,7 @@ sizey = np.shape(y)
 for rep in range(n_reps):
     model_file = root_model_folder + "/" + modelname
     model_file_raw = model_file
+    model_file_raw += "_" + method
     model_file_raw += "_" + str(rep+1)
 
     if append_timestamp:
@@ -133,6 +136,8 @@ for rep in range(n_reps):
             model = classifiers.create_decision_tree()
         elif method == "randomforest":
             model = classifiers.create_random_forest()
+        elif method == "svm":
+            model = classifiers.create_svm_multiclass()
 
         # model = classifiers.create_svm()
         # model = classifiers.create_svm_multiclass()

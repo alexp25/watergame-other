@@ -61,7 +61,6 @@ if config["apply_balancing"]:
 df = loader.format_data(df, config["map_labels"])
 print(df)
 
-quit()
 
 # shuffle dataset rows
 df = df.sample(frac=1, random_state=42).reset_index(drop=True)
@@ -77,8 +76,8 @@ X = X.to_numpy()
 y = y.to_numpy()
 
 if use_scaler:
-    y = y[X[:, 1] < 1000]
-    X = X[X[:, 1] < 1000]
+    # y = y[X[:, 1] < 1000]
+    # X = X[X[:, 1] < 1000]
     train_scaler = MinMaxScaler()
     train_scaler.fit(X)
     X = train_scaler.transform(X)
