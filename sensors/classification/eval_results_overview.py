@@ -1,3 +1,4 @@
+from statistics import mean
 from modules import graph
 
 from modules.graph import Timeseries, Barseries
@@ -40,6 +41,13 @@ for files in files_array:
 print(acc)
 print("create barseries")
 
+print("accuracies:")
+print(acc)
+
+print("average: ")
+print([mean(row) for row in acc])
+
+quit()
 print("plotting chart")
 fig = graph.plot_barchart(
     labels, acc[1], "model", "accuracy [%]", "Classification accuracy", None, limits)
