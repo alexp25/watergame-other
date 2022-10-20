@@ -1,3 +1,4 @@
+from statistics import mean
 from modules import graph
 
 from modules.graph import Timeseries, Barseries
@@ -18,7 +19,7 @@ with open("config.yml", "r") as f:
     config = yaml.load(f)
 
 labels = ["DT", "RF", "Dense", "RNN"]
-limits = [85, 100]
+limits = [75, 100]
 files_array = [["eval_dtree_train", "eval_randomforest_train",
                 "eval_dense_train", "eval_rnn_train"], ["eval_dtree_test", "eval_randomforest_test",
                                                         "eval_dense_test", "eval_rnn_test"]]
@@ -40,6 +41,13 @@ for files in files_array:
 print(acc)
 print("create barseries")
 
+print("accuracies:")
+print(acc)
+
+print("average: ")
+print([mean(row) for row in acc])
+
+quit()
 print("plotting chart")
 fig = graph.plot_barchart(
     labels, acc[1], "model", "accuracy [%]", "Classification accuracy", None, limits)

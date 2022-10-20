@@ -77,8 +77,8 @@ X = X.to_numpy()
 y = y.to_numpy()
 
 if use_scaler:
-    y = y[X[:, 1] < 1000]
-    X = X[X[:, 1] < 1000]
+    # y = y[X[:, 1] < 1000]
+    # X = X[X[:, 1] < 1000]
     train_scaler = MinMaxScaler()
     train_scaler.fit(X)
     X = train_scaler.transform(X)

@@ -4,3 +4,5 @@ numpy
 statsmodels
 scikit-learn
 svgpath2mpl
+colour
+pyyaml

@@ -8,6 +8,9 @@ import pandas as pd
 from datetime import datetime
 from dateutil import parser
 
+import yaml
+config = yaml.safe_load(open("config.yml"))
+
 root_data_folder = "./data"
 # read the data from the csv file
 
@@ -18,7 +21,9 @@ data_file = root_data_folder + "/" + "setup.csv"
 df = loader.load_dataset_pd(data_file)
 
 sensor_list = []
-sensor_list_exp = []
+
+combined_sink_data = config["combined_sink_data"]
+extract_inst_flow = config["extract_inst_flow"]
 
 for row in df.iterrows():
     rowspec = row[1]
@@ -41,17 +46,6 @@ for row in df.iterrows():
                         label = label + '_' + rowspec["tip_loc"]
                 sensor_spec["labels"].append(label)
                 pass
-
-        for k, label in enumerate(sensor_spec["labels"]):
-            sensor_list_exp.append({
-                "online": False,
-                "id": int(rowspec["id"]),
-                "uid": str(sensor_spec["id"]) + "_" + str(k + 1),
-                "label": label,
-                "data": [],
-                "ts": []
-            })
-        # print(row)
         sensor_list.append(sensor_spec)
         print(sensor_spec)
 
@@ -66,6 +60,34 @@ for plot_index, sensor_spec in enumerate(sensor_list):
         continue
 
     df = loader.load_dataset_pd(data_file)
+    n_spec_cols = 3
+    n_chan = len(df.columns) - n_spec_cols
+
+    for i, label in enumerate(sensor_spec["labels"]):
+        if extract_inst_flow:
+            df[label] = df.iloc[:, n_spec_cols+i*2]
+            df[label+"_"] = df.iloc[:, n_spec_cols+i*2+1]
+        else:
+            df[label] = df.iloc[:, n_spec_cols+i*2+1]
+            df[label+"_"] = df.iloc[:, n_spec_cols+i*2]
+
+    cols = [n_spec_cols+i for i in range(n_chan)]
+    df.drop(df.columns[cols], axis=1, inplace=True)
+
+    if combined_sink_data:
+        if "chiuveta_calda" in sensor_spec["labels"]:
+            combined = df["chiuveta_rece"] + df["chiuveta_calda"]
+            df.insert(loc=n_spec_cols, column="chiuveta", value=combined)
+            df.insert(loc=n_spec_cols+1, column="chiuveta_", value=combined)
+            # df["chiuveta_"] = df["chiuveta"]
+            df.drop(["chiuveta_calda"], axis=1, inplace=True)
+            df.drop(["chiuveta_rece"], axis=1, inplace=True)
+            df.drop(["chiuveta_calda_"], axis=1, inplace=True)
+            df.drop(["chiuveta_rece_"], axis=1, inplace=True)
+
+    print(sensor_spec)
+    print(df)
+    # quit()
 
     timestamps = df["timestamp"]
     timestamp_ref = "2021-10-31 04:00:00"
@@ -95,6 +117,10 @@ for plot_index, sensor_spec in enumerate(sensor_list):
 
     # quit()
     filename = "watergame_sample_consumer_" + \
-        str(sensor_spec["id"]) + "_adapted.csv"
+        str(sensor_spec["id"])
+    if combined_sink_data:
+        filename += "_combined"
+    filename += "_adapted"
+    filename += ".csv"
     data_file = root_data_folder + "/" + filename
     loader.write_dataset_pd(df, data_file)

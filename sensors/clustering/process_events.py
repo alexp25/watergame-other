@@ -15,8 +15,7 @@ import yaml
 config = yaml.safe_load(open("config.yml"))
 
 
-extract_inst_flow = False
-# extract_inst_flow = True
+extract_inst_flow = config["extract_inst_flow"]
 
 root_data_folder = "./data"
 # read the data from the csv file

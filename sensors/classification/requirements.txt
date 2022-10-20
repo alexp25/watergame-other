@@ -10,3 +10,4 @@ pydot
 six
 pyyaml==5.4.1
 seaborn==0.11.2
+protobuf==3.20.*
