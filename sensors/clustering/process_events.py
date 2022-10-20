@@ -87,6 +87,13 @@ df.drop("timestamp", inplace=True, axis=1)
 
 df = loader.format_data(df)
 labels = list(df["label"]-1)
+uids = df["uid"]
+uids = list(set(uids))
+print(uids)
+print(len(uids))
+
+# print(df)
+quit()
 
 with open("classes.txt", "w") as f:
     f.write("[" + ",".join([str(label) for label in labels]) + "]")

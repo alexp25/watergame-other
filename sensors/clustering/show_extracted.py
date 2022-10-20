@@ -66,7 +66,7 @@ def run_clustering(x, nc, xheader, xlabels=None):
     return tss, nc
 
 
-nc = 3
+nc = 2
 
 root_data_folder = "./data"
 # read the data from the csv file
@@ -80,7 +80,7 @@ if rolling_filter:
 result_name += ".csv"
 
 plot_all_data = True
-plot_all_data = False
+# plot_all_data = False
 
 start_index = 1
 # end_index = 100
@@ -89,7 +89,7 @@ start_col = 3
 end_col = None
 fill_start = False
 
-selection = "all"
+selection = "chiuveta"
 
 fname_dict = config["fname_dict"]
 title_dict = config["title_dict"]
