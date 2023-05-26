@@ -92,7 +92,7 @@ print(uids)
 print(len(uids))
 
 # print(df)
-quit()
+# quit()
 
 with open("classes.txt", "w") as f:
     f.write("[" + ",".join([str(label) for label in labels]) + "]")

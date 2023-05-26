@@ -32,6 +32,7 @@ for row in df.iterrows():
         sensor_spec = {
             "id": int(rowspec["id"]),
             "loc": rowspec["apartament"] + " - " + rowspec["loc"],
+            "user": rowspec["apartament"],
             "labels": []
         }
         data_labels = ["D1", "D2", "D3", "D4", "D5", "D6", "D7"]
@@ -74,6 +75,8 @@ for plot_index, sensor_spec in enumerate(sensor_list):
     cols = [n_spec_cols+i for i in range(n_chan)]
     df.drop(df.columns[cols], axis=1, inplace=True)
 
+    df.insert(loc=1, column='user', value=sensor_spec['user'])
+
     if combined_sink_data:
         if "chiuveta_calda" in sensor_spec["labels"]:
             combined = df["chiuveta_rece"] + df["chiuveta_calda"]
@@ -85,8 +88,9 @@ for plot_index, sensor_spec in enumerate(sensor_list):
             df.drop(["chiuveta_calda_"], axis=1, inplace=True)
             df.drop(["chiuveta_rece_"], axis=1, inplace=True)
 
-    print(sensor_spec)
-    print(df)
+    # print(sensor_spec)
+    # print(df)
+    # print(np.unique(df['user']))
     # quit()
 
     timestamps = df["timestamp"]

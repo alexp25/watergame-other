@@ -77,7 +77,7 @@ def load_dataset_pd(input_file):
     return dataFrame
 
 def write_dataset_pd(df, output_file):
-    df.to_csv(output_file, sep=',', encoding='utf-8', header=0)
+    df.to_csv(output_file, sep=',', encoding='utf-8', header=1)
 
 def remove_col(x, col):
     # numpy.delete(arr, obj, axis=None)

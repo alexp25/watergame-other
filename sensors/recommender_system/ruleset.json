@@ -1,0 +1,28 @@
+{
+    "water_saving_actions": [
+        {
+            "location": "sink_hot",
+            "threshold": 2,
+            "unit": "minutes",
+            "description": "reduce hot water consumption"
+        },
+        {
+            "location": "sink_cold",
+            "threshold": 2,
+            "unit": "minutes",
+            "description": "turn off tap while brushing teeth"
+        },
+        {
+            "location": "toilet",
+            "threshold": 2,
+            "unit": "minutes",
+            "description": "use the low volume flush if available"
+        },
+        {
+            "location": "shower",
+            "threshold": 2,
+            "unit": "minutes",
+            "description": "take shorter showers"
+        }
+    ]
+}

@@ -1,0 +1,38 @@
+collab_values = []
+current_values = []
+sources = set()
+
+for user in users:
+    collab_values.append(user['collab'])
+    current_values.append(user['current'])
+    sources |= set(user['sources'])
+
+# Create a dictionary to store the values for each source
+source_values = {source: [] for source in sources}
+
+# Fill in the source_values dictionary with the collab and current values for each user
+for user in users:
+    user_source_values = {source: [0, 0] for source in sources}
+    for source in sources:
+        if source in user['sources']:
+            user_source_values[source][0] = user['collab'][0]
+            user_source_values[source][1] = user['current'][0]
+    for source in sources:
+        source_values[source].append(user_source_values[source][0])
+        source_values[source].append(user_source_values[source][1])
+
+# Plot a grouped bar chart
+x = np.arange(len(users))
+width = 0.2
+
+fig, ax = plt.subplots()
+
+for i, source in enumerate(sources):
+    ax.bar(x - 2*width/3 + i*width/len(sources), source_values[source][:len(users)*2:2], width/len(sources), label='{} collab'.format(source))
+    ax.bar(x - width/3 + i*width/len(sources), source_values[source][1:len(users)*2:2], width/len(sources), label='{} current'.format(source))
+
+ax.set_xticks(x)
+ax.set_xticklabels(['User {}'.format(i+1) for i in x])
+ax.legend()
+
+plt.show()

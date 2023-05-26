@@ -48,6 +48,10 @@ print("start")
 
 events = []
 
+# load sensors list
+data_file = root_data_folder + "/" + "setup.csv"
+df_setup = loader.load_dataset_pd(data_file)
+
 for i in range(sx[0]):
     print(i)
     data = x[i, start_col:]
@@ -93,6 +97,7 @@ for i in range(sx[0]):
         volume = np.sum(event)
         new_event = {
             "sid": x[i, 0],
+            "user": x[i,222],
             "event": j,
             "label": x[i, 1],
             "duration": duration,
@@ -104,9 +109,9 @@ for i in range(sx[0]):
         # quit()
         events.append(new_event)
 
-exp_data = "uid,label,no,duration,volume,timestamp\n"
+exp_data = "uid,user,label,no,duration,volume,timestamp\n"
 for evt in events:
-    exp_data_row = str(evt["sid"]) + "," + str(evt["label"]) + "," + str(
+    exp_data_row = str(evt["sid"]) + "," + str(evt["user"]) + "," + str(evt["label"]) + "," + str(
         evt["event"]) + "," + str(evt["duration"]) + "," + str(evt["volume"]) + "," + str(evt["ts"]) + "\n"
     exp_data += exp_data_row
 

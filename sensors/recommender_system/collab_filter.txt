@@ -1,0 +1,8 @@
+To build a collaborative filter recommender system, you can follow the following steps:
+
+Split the data into training and testing sets.
+Calculate the mean consumption for each user and source in the training set.
+Calculate the deviation of each consumption value from its respective mean in the training set.
+Calculate the similarity between users based on their consumption patterns. A common metric for similarity is the cosine similarity.
+For each user and source in the testing set, find the K most similar users and calculate the weighted average of their deviations from the mean consumption for that source. The weights are the cosine similarities between the users.
+Add the weighted average to the mean consumption for that user and source to get the recommended consumption value.
